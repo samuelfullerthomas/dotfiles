@@ -1,0 +1,14 @@
+# Node
+npm-debug.log
+
+# Mac
+.DS_Store
+
+development.yml
+
+#vs code
+.vscode
+
+#Random folders
+stuff
+.cache

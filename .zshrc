@@ -1,0 +1,102 @@
+# path
+export PATH=$HOME/bin:/usr/local/bin:$HOME/.cargo/bin:$PATH:$PATH
+
+# path to oh-my-zsh installation.
+export ZSH=/Users/$USER/.oh-my-zsh
+
+# theme
+ZSH_THEME="cloud"
+
+# plugins
+# plugins=(
+#   git
+# )
+
+# resource ZSH
+source $ZSH/oh-my-zsh.sh
+
+# ssh
+export SSH_KEY_PATH="~/.ssh/rsa_id"
+
+# functions
+repeatspeed () {
+  defaults write NSGlobalDomain KeyRepeat -int :$1
+  echo "hows that speed for ya."
+}
+
+killport () {
+  lsof -i TCP:$1 | grep LISTEN | awk '{print $2}' | xargs kill -9
+  echo "He's dead Jim."
+}
+
+
+#iterm
+source ~/.iterm2_shell_integration.zsh
+iterm2_print_user_vars() {
+  iterm2_set_user_var gitBranch $((git branch 2> /dev/null) | grep \* | cut -c3-)
+}
+
+# aliases
+alias reload="source ~/.zshrc"
+alias rebootexp="fusion kill && fusion boot experiences"
+alias clean-docker='docker system prune -a'
+alias gco="git checkout"
+alias gp="git push"
+alias rmssg="rm .ssg-config-*"
+alias gh='gh-home'
+
+# alias gcp="git checkout $1 && git pull"
+alias dubit="NODE_ENV=development /Users/$USER/qubit/qubit-cli/bin/qubit"
+alias zsh="code ~/.zshrc"
+alias zshrc="code ~/.zshrc"
+
+# baton
+alias bprod='baton -e production '
+alias bstag='baton -e staging '
+
+alias kprod='baton -e production kubectl '
+alias kstag='baton -e staging kubectl '
+
+alias hprod='baton -e production helm '
+alias hstag='baton -e staging helm '
+
+alias cleanup='brew cleanup &&docker system prune'
+
+#nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+eval "$(rbenv init -)"
+
+# PS1 (prompt)
+parse_git_branch() {
+	hasmod=""
+	if [[ `git ls-files -dmo --exclude-standard 2> /dev/null` ]]; then
+		hasmod="*"
+	fi
+	git branch 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/(\1$hasmod)/"
+}
+
+export PS1="%~%{%F{green}%} \$(parse_git_branch) $ %{%F{white}%}"
+# %T	System time (HH:MM).
+# %*	System time (HH:MM:SS).
+# %D	System date (YY-MM-DD).
+# %n	Current username.
+# %B - %b	Begin - end bold print.
+# %U - %u	Begin - end underlining.
+# %d	The current working directory.
+# %~	The current working directory, relative to the home directory.
+# %M	The computer's hostname.
+# %m	The computer's hostname (truncated before the first period).
+# %l	The current tty.
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f "/Users/$USER/google-cloud-sdk/path.zsh.inc" ]; then . "/Users/$USER/google-cloud-sdk/path.zsh.inc"; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f "/Users/$USER/google-cloud-sdk/completion.zsh.inc" ]; then . "/Users/$USER/google-cloud-sdk/completion.zsh.inc"; fi
+[[ -s "$HOME/.avn/bin/avn.sh" ]] && source "$HOME/.avn/bin/avn.sh" # load avn
