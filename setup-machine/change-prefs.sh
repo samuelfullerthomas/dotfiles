@@ -111,3 +111,10 @@ defaults write com.google.Chrome.canary AppleEnableMouseSwipeNavigateWithScrolls
 ###############################################################################
 
 cp ./iterm2-backup-profile.json ~/Library/Application\ Support/iTerm2/DynamicProfiles/
+
+
+###############################################################################
+# zsh                                                                         #
+###############################################################################
+
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"

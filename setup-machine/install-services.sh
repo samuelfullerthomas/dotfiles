@@ -1,4 +1,5 @@
 #!/bin/sh
+sudo chown -R $(whoami) $(brew --prefix)/*
 brew install git
 brew install imagemagick
 brew install homebrew/versions/mysql56
@@ -6,6 +7,9 @@ brew install python
 brew install rbenv
 brew install redis
 brew install ruby
+brew install bash-completion
+brew cask install docker
+brew install kubectl
 
 # nvm
 curl -o- https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
