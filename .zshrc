@@ -1,6 +1,5 @@
 # path
-export PATH=$HOME/bin:/usr/local/bin:$HOME/.cargo/bin:$PATH:$PATH
-
+export PATH=$HOME/bin:/usr/local/bin:$HOME/.cargo/bin:$PATH:$PATH/usr/local/sbin:$PATH
 # path to oh-my-zsh installation.
 export ZSH=/Users/$USER/.oh-my-zsh
 
@@ -44,6 +43,8 @@ alias gco="git checkout"
 alias gp="git push"
 alias rmssg="rm .ssg-config-*"
 alias gh='gh-home'
+alias steam='wine ~/.wine/drive_c/Program\ Files\ \(x86\)/Steam'
+alias winef='cd ~/.wine/drive_c/Program\ Files\ \(x86\)/'
 
 # alias gcp="git checkout $1 && git pull"
 alias dubit="NODE_ENV=development /Users/$USER/qubit/qubit-cli/bin/qubit"
@@ -61,7 +62,6 @@ alias hprod='baton -e production helm '
 alias hstag='baton -e staging helm '
 
 alias cleanup='brew cleanup &&docker system prune'
-
 #nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -93,10 +93,11 @@ export PS1="%~%{%F{green}%} \$(parse_git_branch) $ %{%F{white}%}"
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
+[[ -s "$HOME/.avn/bin/avn.sh" ]] && source "$HOME/.avn/bin/avn.sh" # load avn
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f "/Users/$USER/google-cloud-sdk/path.zsh.inc" ]; then . "/Users/$USER/google-cloud-sdk/path.zsh.inc"; fi
+if [ -f '/Users/samthomas/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/samthomas/google-cloud-sdk/path.zsh.inc'; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f "/Users/$USER/google-cloud-sdk/completion.zsh.inc" ]; then . "/Users/$USER/google-cloud-sdk/completion.zsh.inc"; fi
-[[ -s "$HOME/.avn/bin/avn.sh" ]] && source "$HOME/.avn/bin/avn.sh" # load avn
+if [ -f '/Users/samthomas/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/samthomas/google-cloud-sdk/completion.zsh.inc'; fi
+
