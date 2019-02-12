@@ -44,3 +44,8 @@ bat
 baton
 laton
 saton
+
+
+Things to install manually
+
+https://cloud.google.com/sdk/docs/quickstart-macos
