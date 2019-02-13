@@ -100,4 +100,3 @@ if [ -f '/Users/samthomas/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/samth
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/samthomas/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/samthomas/google-cloud-sdk/completion.zsh.inc'; fi
-

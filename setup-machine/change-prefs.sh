@@ -12,7 +12,7 @@ sudo nvram SystemAudioVolume=" "
 ###############################################################################
 
 # Follow the keyboard focus while zoomed in
-defaults write com.apple.universalaccess closeViewZoomFollowsFocus -bool true
+# defaults write com.apple.universalaccess closeViewZoomFollowsFocus -bool true
 
 # Set the screenshots folder to the cloud
 defaults write com.apple.screencapture location /Users/$USER/Documents/Screenshots
@@ -104,17 +104,3 @@ defaults write com.google.Chrome.canary AppleEnableSwipeNavigateWithScrolls -boo
 # Disable the all too sensitive backswipe on Magic Mouse
 defaults write com.google.Chrome AppleEnableMouseSwipeNavigateWithScrolls -bool false
 defaults write com.google.Chrome.canary AppleEnableMouseSwipeNavigateWithScrolls -bool false
-
-
-###############################################################################
-# iTerm 2                                                                     #
-###############################################################################
-
-cp ./iterm2-backup-profile.json ~/Library/Application\ Support/iTerm2/DynamicProfiles/
-
-
-###############################################################################
-# zsh                                                                         #
-###############################################################################
-
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
