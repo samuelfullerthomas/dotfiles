@@ -50,6 +50,11 @@ killport () {
   lsof -i TCP:$1 | grep LISTEN | awk '{print $2}' | xargs kill -9
   echo "He's dead Jim."
 }
+killp () {
+  pgrep $1 | xargs kill -9
+  pgrep $1
+  echo "so much blood."
+}
 
 
 #iterm
@@ -59,6 +64,7 @@ iterm2_print_user_vars() {
 }
 
 # aliases
+alias killchromium="pgrep Chromium | xargs kill -9"
 alias reload="source ~/.zshrc"
 alias rebootexp="fusion kill && fusion boot experiences"
 alias clean-docker='docker system prune -a'
