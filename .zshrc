@@ -91,6 +91,7 @@ alias hprod='baton -e production helm '
 alias hstag='baton -e staging helm '
 
 alias cleanup='brew cleanup &&docker system prune'
+alias restore-exp-stg="fusion restore -e staging experiences -p '&IzYc6Zl5QjdX%5FfqDdmj:9WpxrX8'"
 #nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
