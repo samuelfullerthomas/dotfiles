@@ -22,7 +22,7 @@ else
 fi
 
 # path
-export PATH=$HOME/bin:/usr/local/bin:$HOME/.cargo/bin:$PATH:$PATH/usr/local/sbin:$PATH
+export PATH=$HOME/bin:/usr/local/bin:$HOME/.cargo/bin:$HOME/.zshrc:$PATH:$PATH/usr/local/sbin:$PATH
 # path to oh-my-zsh installation.
 export ZSH=/Users/$USER/.oh-my-zsh
 
