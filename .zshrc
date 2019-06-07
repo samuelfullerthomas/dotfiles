@@ -1,5 +1,28 @@
+SSH_ENV="$HOME/.ssh/environment"
+
+function start_agent {
+    echo "Initialising new SSH agent..."
+    /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+    echo succeeded
+    chmod 600 "${SSH_ENV}"
+    . "${SSH_ENV}" > /dev/null
+    /usr/bin/ssh-add;
+}
+
+# Source SSH settings, if applicable
+
+if [ -f "${SSH_ENV}" ]; then
+    . "${SSH_ENV}" > /dev/null
+    #ps ${SSH_AGENT_PID} doesn't work under cywgin
+    ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
+        start_agent;
+    }
+else
+    start_agent;
+fi
+
 # path
-export PATH=$HOME/bin:/usr/local/bin:$HOME/.cargo/bin:$PATH:$PATH/usr/local/sbin:$PATH
+export PATH=$HOME/bin:/usr/local/bin:$HOME/.cargo/bin:$HOME/.zshrc:$PATH:$PATH/usr/local/sbin:$PATH
 # path to oh-my-zsh installation.
 export ZSH=/Users/$USER/.oh-my-zsh
 
@@ -27,6 +50,11 @@ killport () {
   lsof -i TCP:$1 | grep LISTEN | awk '{print $2}' | xargs kill -9
   echo "He's dead Jim."
 }
+killp () {
+  pgrep $1 | xargs kill -9
+  pgrep $1
+  echo "so much blood."
+}
 
 
 #iterm
@@ -36,6 +64,7 @@ iterm2_print_user_vars() {
 }
 
 # aliases
+alias killchromium="pgrep Chromium | xargs kill -9"
 alias reload="source ~/.zshrc"
 alias rebootexp="fusion kill && fusion boot experiences"
 alias clean-docker='docker system prune -a'
@@ -62,6 +91,7 @@ alias hprod='baton -e production helm '
 alias hstag='baton -e staging helm '
 
 alias cleanup='brew cleanup &&docker system prune'
+alias restore-exp-stg="fusion restore -e staging experiences -p '&IzYc6Zl5QjdX%5FfqDdmj:9WpxrX8'"
 #nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -100,4 +130,3 @@ if [ -f '/Users/samthomas/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/samth
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/samthomas/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/samthomas/google-cloud-sdk/completion.zsh.inc'; fi
-
