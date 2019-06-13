@@ -6,3 +6,5 @@
 !.gitconfig
 !.gitignore_global
 !.aws
+!.vim
+!.vimrc
