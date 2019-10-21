@@ -1,4 +1,5 @@
 SSH_ENV="$HOME/.ssh/environment"
+[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
 
 function start_agent {
     echo "Initialising new SSH agent..."
