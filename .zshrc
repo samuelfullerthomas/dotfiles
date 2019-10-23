@@ -73,6 +73,7 @@ alias gp="git push"
 alias gh='gh-home'
 alias steam='wine ~/.wine/drive_c/Program\ Files\ \(x86\)/Steam'
 alias winef='cd ~/.wine/drive_c/Program\ Files\ \(x86\)/'
+alias screenschots-folder='echo "defaults write com.apple.screencapture location <path here>"'
 
 # alias gcp="git checkout $1 && git pull"
 alias zsh="code ~/.zshrc"
