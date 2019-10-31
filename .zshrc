@@ -123,3 +123,6 @@ if [ -f '/Users/samthomas/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" 
+
+export PATH="$HOME/.dotnet/tools:$PATH"
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
