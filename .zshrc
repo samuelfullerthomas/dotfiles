@@ -66,11 +66,9 @@ iterm2_print_user_vars() {
 # aliases
 alias killchromium="pgrep Chromium | xargs kill -9"
 alias reload="source ~/.zshrc"
-alias rebootexp="fusion kill && fusion boot experiences"
 alias clean-docker='docker system prune -a'
 alias gco="git checkout"
 alias gp="git push"
-alias rmssg="rm .ssg-config-*"
 alias gh='gh-home'
 alias steam='wine ~/.wine/drive_c/Program\ Files\ \(x86\)/Steam'
 alias winef='cd ~/.wine/drive_c/Program\ Files\ \(x86\)/'
@@ -91,7 +89,6 @@ alias hprod='baton -e production helm '
 alias hstag='baton -e staging helm '
 
 alias cleanup='brew cleanup &&docker system prune'
-alias restore-exp-stg="fusion restore -e staging experiences -p '&IzYc6Zl5QjdX%5FfqDdmj:9WpxrX8'"
 #nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
