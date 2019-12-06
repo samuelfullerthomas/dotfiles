@@ -1,10 +1,14 @@
 # Misleading named dotfiles
 
-## usage
+## Usage
+### Step 1
+1. run `git init`
+2. `git remote add origin https://github.com/samuelfullerthomas/dotfiles.git`
+3. `git checkout -b master --track origin/master`
+4. `git pull`
 
-1. clone repo into the \$HOME directory:
-
-2. run `make machine`
+### Step 2
+1. run `make machine`
 
 Hi! this is the home directory for this computer and it is also a fairly exclusive git repo
 
@@ -51,6 +55,6 @@ private internet access
 docker for mac
 photoshop
 
-Things to install manually
+### Things to install manually
 
 https://cloud.google.com/sdk/docs/quickstart-macos
