@@ -1,6 +1,10 @@
 # Misleading named dotfiles
+![img](https://user-images.githubusercontent.com/10165959/70323974-2bbf4280-1826-11ea-80fe-0649d87c9ae1.gif)
 
 ## Usage
+### Step 0
+Install xcode - `xcode-select --install`
+
 ### Step 1
 1. run `git init`
 2. `git remote add origin https://github.com/samuelfullerthomas/dotfiles.git`
