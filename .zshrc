@@ -1,4 +1,5 @@
 SSH_ENV="$HOME/.ssh/environment"
+[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
 
 function start_agent {
     echo "Initialising new SSH agent..."
@@ -72,23 +73,14 @@ alias gp="git push"
 alias gh='gh-home'
 alias steam='wine ~/.wine/drive_c/Program\ Files\ \(x86\)/Steam'
 alias winef='cd ~/.wine/drive_c/Program\ Files\ \(x86\)/'
+alias screenschots-folder='echo "defaults write com.apple.screencapture location <path here>"'
 
 # alias gcp="git checkout $1 && git pull"
-alias dubit="NODE_ENV=development /Users/$USER/qubit/qubit-cli/bin/qubit"
 alias zsh="code ~/.zshrc"
 alias zshrc="code ~/.zshrc"
 
-# baton
-alias bprod='baton -e production '
-alias bstag='baton -e staging '
-
-alias kprod='baton -e production kubectl '
-alias kstag='baton -e staging kubectl '
-
-alias hprod='baton -e production helm '
-alias hstag='baton -e staging helm '
-
-alias cleanup='brew cleanup &&docker system prune'
+# docker
+alias cleanup='brew cleanup && docker system prune'
 #nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -127,3 +119,10 @@ if [ -f '/Users/samthomas/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/samth
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/samthomas/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/samthomas/google-cloud-sdk/completion.zsh.inc'; fi
+
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" 
+
+export PATH="$HOME/.dotnet/tools:$PATH"
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
