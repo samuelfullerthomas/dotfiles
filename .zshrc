@@ -24,8 +24,9 @@ fi
 
 # path
 export PATH=$HOME/bin:/usr/local/bin:$HOME/.cargo/bin:$HOME/.zshrc:$PATH:$PATH/usr/local/sbin:$PATH
+export ZSH_DISABLE_COMPFIX=true
 # path to oh-my-zsh installation.
-export ZSH=/Users/$USER/.oh-my-zsh
+export ZSH=$HOME/.oh-my-zsh
 
 # theme
 ZSH_THEME="cloud"
@@ -74,6 +75,10 @@ alias gh='gh-home'
 alias steam='wine ~/.wine/drive_c/Program\ Files\ \(x86\)/Steam'
 alias winef='cd ~/.wine/drive_c/Program\ Files\ \(x86\)/'
 alias screenschots-folder='echo "defaults write com.apple.screencapture location <path here>"'
+alias code="code-insiders"
+alias lb="ssh root@209.97.141.227"
+alias server-ssh='ssh root@68.183.44.201'
+alias server-ip='echo 68.183.44.201'
 
 # alias gcp="git checkout $1 && git pull"
 alias zsh="code ~/.zshrc"
@@ -119,10 +124,6 @@ if [ -f '/Users/samthomas/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/samth
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/samthomas/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/samthomas/google-cloud-sdk/completion.zsh.inc'; fi
-
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" 
 
 export PATH="$HOME/.dotnet/tools:$PATH"
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
