@@ -40,7 +40,13 @@ ZSH_THEME="cloud"
 source $ZSH/oh-my-zsh.sh
 
 # ssh
+export MEETUP_KEY=515927b636e132036c50656358641b
+export authId=MANDCWOWIXNTG2YZQXNT
+export authToken=MDBhNGQyNjA4NTU2ODIzZjQxMzc2M2FhY2Q2OGE1
 export SSH_KEY_PATH="~/.ssh/rsa_id"
+
+# github
+export GITHUB_TOKEN="319f4b79fecb87a2bdfeed98d9467d009f260116"
 
 # functions
 repeatspeed () {
@@ -57,7 +63,6 @@ killp () {
   pgrep $1
   echo "so much blood."
 }
-
 
 #iterm
 source ~/.iterm2_shell_integration.zsh
