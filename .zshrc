@@ -47,7 +47,7 @@ export SSH_KEY_PATH="~/.ssh/rsa_id"
 
 # github
 export GITHUB_TOKEN="319f4b79fecb87a2bdfeed98d9467d009f260116"
-
+export OCTO_LINKER_TOKEN="78a2df7236777db2559ffdf9036a0e5774125469"
 # functions
 repeatspeed () {
   defaults write NSGlobalDomain KeyRepeat -int :$1
