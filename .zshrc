@@ -31,6 +31,10 @@ export ZSH=$HOME/.oh-my-zsh
 # theme
 ZSH_THEME="cloud"
 
+# GPG stuff
+# https://github.com/keybase/keybase-issues/issues/2798
+export GPG_TTY=$(tty)
+
 # plugins
 # plugins=(
 #   git
@@ -76,11 +80,9 @@ alias reload="source ~/.zshrc"
 alias clean-docker='docker system prune -a'
 alias gco="git checkout"
 alias gp="git push"
-alias gh='gh-home'
 alias steam='wine ~/.wine/drive_c/Program\ Files\ \(x86\)/Steam'
 alias winef='cd ~/.wine/drive_c/Program\ Files\ \(x86\)/'
 alias screenschots-folder='echo "defaults write com.apple.screencapture location <path here>"'
-alias code="code-insiders"
 alias lb="ssh root@209.97.141.227"
 alias server-ssh='ssh root@68.183.44.201'
 alias server-ip='echo 68.183.44.201'
