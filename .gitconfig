@@ -1,6 +1,6 @@
 [user]
 	name = Sam Thomas
-	email = samuelfullerthomas@protonmail.com
+	email = sft89@pm.me
 	signingkey = 4EFD83FB40FABF3D
 [core]
 	excludesfile = ~/.gitignore_global
