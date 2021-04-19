@@ -86,7 +86,7 @@ alias screenschots-folder='echo "defaults write com.apple.screencapture location
 alias lb="ssh root@209.97.141.227"
 alias server-ssh='ssh root@68.183.44.201'
 alias server-ip='echo 68.183.44.201'
-
+alias delete-mail='echo "d *" | mail -N'
 # alias gcp="git checkout $1 && git pull"
 alias zsh="code ~/.zshrc"
 alias zshrc="code ~/.zshrc"
