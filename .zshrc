@@ -24,11 +24,16 @@ fi
 
 # path
 export PATH=$HOME/bin:/usr/local/bin:$HOME/.cargo/bin:$HOME/.zshrc:$PATH:$PATH/usr/local/sbin:$PATH
+export ZSH_DISABLE_COMPFIX=true
 # path to oh-my-zsh installation.
-export ZSH=/Users/$USER/.oh-my-zsh
+export ZSH=$HOME/.oh-my-zsh
 
 # theme
 ZSH_THEME="cloud"
+
+# GPG stuff
+# https://github.com/keybase/keybase-issues/issues/2798
+export GPG_TTY=$(tty)
 
 # plugins
 # plugins=(
@@ -39,8 +44,14 @@ ZSH_THEME="cloud"
 source $ZSH/oh-my-zsh.sh
 
 # ssh
+export MEETUP_KEY=515927b636e132036c50656358641b
+export authId=MANDCWOWIXNTG2YZQXNT
+export authToken=MDBhNGQyNjA4NTU2ODIzZjQxMzc2M2FhY2Q2OGE1
 export SSH_KEY_PATH="~/.ssh/rsa_id"
 
+# github
+export GITHUB_TOKEN="319f4b79fecb87a2bdfeed98d9467d009f260116"
+export OCTO_LINKER_TOKEN="78a2df7236777db2559ffdf9036a0e5774125469"
 # functions
 repeatspeed () {
   defaults write NSGlobalDomain KeyRepeat -int :$1
@@ -57,7 +68,6 @@ killp () {
   echo "so much blood."
 }
 
-
 #iterm
 source ~/.iterm2_shell_integration.zsh
 iterm2_print_user_vars() {
@@ -70,11 +80,13 @@ alias reload="source ~/.zshrc"
 alias clean-docker='docker system prune -a'
 alias gco="git checkout"
 alias gp="git push"
-alias gh='gh-home'
 alias steam='wine ~/.wine/drive_c/Program\ Files\ \(x86\)/Steam'
 alias winef='cd ~/.wine/drive_c/Program\ Files\ \(x86\)/'
 alias screenschots-folder='echo "defaults write com.apple.screencapture location <path here>"'
-
+alias lb="ssh root@209.97.141.227"
+alias server-ssh='ssh root@68.183.44.201'
+alias server-ip='echo 68.183.44.201'
+alias delete-mail='echo "d *" | mail -N'
 # alias gcp="git checkout $1 && git pull"
 alias zsh="code ~/.zshrc"
 alias zshrc="code ~/.zshrc"
@@ -119,10 +131,6 @@ if [ -f '/Users/samthomas/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/samth
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/samthomas/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/samthomas/google-cloud-sdk/completion.zsh.inc'; fi
-
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" 
 
 export PATH="$HOME/.dotnet/tools:$PATH"
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
