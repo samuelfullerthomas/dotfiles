@@ -1,6 +1,7 @@
 [user]
 	name = Sam Thomas
-	email = samuelfullerthomas@gmail.com
+	email = sft89@pm.me
+	signingkey = 4EFD83FB40FABF3D
 [core]
 	excludesfile = ~/.gitignore_global
 [pager]
@@ -10,3 +11,5 @@
 	process = git-lfs filter-process
 	required = true
 	clean = git-lfs clean -- %f
+[commit]
+	gpgsign = true

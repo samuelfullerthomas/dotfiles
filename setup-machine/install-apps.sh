@@ -13,27 +13,27 @@ brew cleanup
 export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 
 # utils
-brew cask install daisydisk
-brew cask install viscosity
-brew cask install kap
-brew cask install muzzle
-brew cask install private-internet-access
-brew cask install authy
-brew cask install sequel-pro
+brew install daisydisk
+brew install viscosity
+brew install kap
+brew install muzzle
+brew install private-internet-access
+brew install authy
+brew install sequel-pro
 
 # browsers
-brew cask install firefox
-brew cask install homebrew/cask-versions/firefox-developer-edition
-brew cask install google-chrome
+brew install homebrew/cask-versions/firefox-developer-edition
+brew install google-chrome
 
 # dev
-brew cask install iterm2
-brew cask install virtualbox
+brew install iterm2
+#brew install virtualbox
 
 # editors
-brew cask install visual-studio-code
+brew install visual-studio-code
 
 # fun
-brew cask install slack
-brew cask install spotify
-brew cask install vlc
+brew install slack
+brew install spotify
+brew install vlc
+brew install vnc-viewer
