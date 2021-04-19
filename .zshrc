@@ -35,11 +35,6 @@ ZSH_THEME="cloud"
 # https://github.com/keybase/keybase-issues/issues/2798
 export GPG_TTY=$(tty)
 
-# plugins
-# plugins=(
-#   git
-# )
-
 # resource ZSH
 source $ZSH/oh-my-zsh.sh
 
@@ -52,29 +47,35 @@ export SSH_KEY_PATH="~/.ssh/rsa_id"
 # github
 export GITHUB_TOKEN="319f4b79fecb87a2bdfeed98d9467d009f260116"
 export OCTO_LINKER_TOKEN="78a2df7236777db2559ffdf9036a0e5774125469"
+
 # functions
-repeatspeed () {
+function repeatspeed () {
   defaults write NSGlobalDomain KeyRepeat -int :$1
   echo "hows that speed for ya."
 }
 
-killport () {
+function killport () {
   lsof -i TCP:$1 | grep LISTEN | awk '{print $2}' | xargs kill -9
   echo "He's dead Jim."
 }
-killp () {
-  pgrep $1 | xargs kill -9
+
+function killp () {
+  sudo pgrep $1 | sudo xargs kill -9
   pgrep $1
   echo "so much blood."
 }
 
-#iterm
+# iterm
 source ~/.iterm2_shell_integration.zsh
 iterm2_print_user_vars() {
   iterm2_set_user_var gitBranch $((git branch 2> /dev/null) | grep \* | cut -c3-)
 }
 
 # aliases
+alias zsh-aliases="grep alias ~/.zshrc"
+alias zsh-functions="grep function ~/.zshrc"
+alias help="echo 'try the command zsh-aliases to show you available aliases, or zsh-functions to show you available functions\ntry entering env to see environment variables'"
+
 alias killchromium="pgrep Chromium | xargs kill -9"
 alias reload="source ~/.zshrc"
 alias clean-docker='docker system prune -a'
@@ -87,13 +88,16 @@ alias lb="ssh root@209.97.141.227"
 alias server-ssh='ssh root@68.183.44.201'
 alias server-ip='echo 68.183.44.201'
 alias delete-mail='echo "d *" | mail -N'
-# alias gcp="git checkout $1 && git pull"
+alias git-lastme="git for-each-ref --format=' %(authorname) %09 %(refname) %(committerdate)' --sort=authorname --sort=-committerdate | grep 'Sam Thomas'"
+alias mv-npmrc='mv ~/.npmrc ~/.npmrc-temp'
+alias mvb-npmrc='mv ~/.npmrc-temp ~/.npmrc'
 alias zsh="code ~/.zshrc"
 alias zshrc="code ~/.zshrc"
 
 # docker
 alias cleanup='brew cleanup && docker system prune'
-#nvm
+
+# nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
