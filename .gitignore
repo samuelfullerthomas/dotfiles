@@ -3,7 +3,8 @@
 !/setup-machine/
 !.zshrc
 !.gitignore
-!.gitconfig
+!.gitconfig.personal
+!.gitconfig.trainline
 !.gitignore_global
 !.vim
 !.vimrc

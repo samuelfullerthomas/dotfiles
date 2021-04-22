@@ -1,0 +1,15 @@
+[user]
+	name = Sam Thomas
+	email = samuel.thomas@thetrainline.com
+	signingkey = 2465D14BC937162A
+[core]
+	excludesfile = ~/.gitignore_global
+[pager]
+	branch = false
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+[commit]
+	gpgsign = true
