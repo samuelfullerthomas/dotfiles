@@ -65,6 +65,27 @@ function killp () {
   echo "so much blood."
 }
 
+function gitconfig () {
+  if [ $# -eq 0 ] || [ $1 = "--help" ]; then
+    echo "usage:"
+    echo "gitconfig <profile> ------ switch to that profile"
+    echo "gitconfig --help    ------ print this help text"
+    echo "gitconfig --profiles  ------ show available profiles"
+  elif [ $1 = "--profiles" ]; then
+    echo "Available profiles:"
+    find $HOME/.gitconfig.* | awk -F "." '{print $3}'
+  elif [ -f "$HOME/.gitconfig.$1" ]; then
+    rm $HOME/.gitconfig
+    cp $HOME/.gitconfig.$1 $HOME/.gitconfig
+    echo "Now using $1 config as .gitconfig"
+  else
+    echo "$HOME/.gitconfig.$1 not found"
+    echo "Available profiles:"
+    find $HOME/.gitconfig.* | awk -F "." '{print $3}'
+  fi
+}
+
+
 # iterm
 source ~/.iterm2_shell_integration.zsh
 iterm2_print_user_vars() {
