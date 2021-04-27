@@ -1,5 +1,6 @@
 /*
 /*/
+.gitconfig
 !/setup-machine/
 !.zshrc
 !.gitignore
