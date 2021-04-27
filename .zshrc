@@ -85,10 +85,36 @@ function gitconfig () {
   fi
 }
 
+function openpr() {
+  github_url=`git remote -v | awk '/fetch/{print $2}' | sed -Ee 's#(git@|git://)#https://#' -e 's@com:@com/@' -e 's%\.git$%%' | awk '/github/'`;
+  branch_name=`git symbolic-ref HEAD | cut -d"/" -f 3,4`;
+  pr_url=$github_url"/compare/master..."$branch_name
+  open $pr_url;
+}
+
+function grephelp() {
+  echo "Before: -B: ex: grep -B 4 'keyword' /path/to/file.log"
+  echo "After: -A: ex: grep -A 4 'keyword' /path/to/file.log"
+}
+
+function grepp() {
+  grep -B $1 -A $1 $2 $3
+}
+
+function catp() {
+  if [ $# -eq 0 ]; then
+    echo 'catp usage: catp <term> <padding lines>'
+  elif [ $# -eq 2 ]; then
+    grep -B $2 -A $2 $1 ./package.json
+  fi
+  grep $1 ./package.json
+}
 
 # iterm
 source ~/.iterm2_shell_integration.zsh
+
 iterm2_print_user_vars() {
+  iterm2_set_user_var profile $(egrep -o '[^[:space:]]+@[^[:space:]]+' ~/.gitconfig)
   iterm2_set_user_var gitBranch $((git branch 2> /dev/null) | grep \* | cut -c3-)
 }
 
@@ -102,6 +128,7 @@ alias reload="source ~/.zshrc"
 alias clean-docker='docker system prune -a'
 alias gco="git checkout"
 alias gp="git push"
+alias gpo="git push -u"
 alias steam='wine ~/.wine/drive_c/Program\ Files\ \(x86\)/Steam'
 alias winef='cd ~/.wine/drive_c/Program\ Files\ \(x86\)/'
 alias screenschots-folder='echo "defaults write com.apple.screencapture location <path here>"'
