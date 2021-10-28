@@ -60,7 +60,7 @@ function killport () {
 }
 
 function killp () {
-  sudo pgrep $1 | sudo xargs kill -9
+  pgrep $1 | xargs kill -9
   pgrep $1
   echo "so much blood."
 }
@@ -141,7 +141,8 @@ alias mv-npmrc='mv ~/.npmrc ~/.npmrc-temp'
 alias mvb-npmrc='mv ~/.npmrc-temp ~/.npmrc'
 alias zsh="code ~/.zshrc"
 alias zshrc="code ~/.zshrc"
-
+alias nap="pmset sleepnow"
+alias killrim="killp Rim"
 # docker
 alias cleanup='brew cleanup && docker system prune'
 
