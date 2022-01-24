@@ -1,7 +1,7 @@
 [user]
 	name = Sam Thomas
-	email = samuel.thomas@thetrainline.com
-	signingkey = 2465D14BC937162A
+	email = sthomas@coveo.com
+	signingkey = BC0D1F8B5143DF97
 [core]
 	excludesfile = ~/.gitignore_global
 [pager]
