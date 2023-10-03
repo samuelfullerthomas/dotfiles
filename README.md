@@ -30,6 +30,8 @@ This will make the repo track the remote and switch to the master branch
 
 1. run `make machine`
 
+this one will take a while, as it installs services, applications, and utilities
+
 ### Web browsers
 
 Firefox developer version
