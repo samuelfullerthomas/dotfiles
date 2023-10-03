@@ -1,6 +1,9 @@
 #!/bin/sh
-sudo chown -R $(whoami) $(brew --prefix)/*
+echo "installing services..."
+
 brew install git
+brew install git-gui
+brew install rbenv
 brew install imagemagick
 brew install homebrew/versions/mysql56
 brew install python
@@ -8,22 +11,20 @@ brew install rbenv
 brew install redis
 brew install ruby
 brew install bash-completion
-brew cask install docker
+brew install docker
 brew install kubectl
 
+echo "all services installed!"
+
 # nvm
+echo "installing nvm..."
 curl -o- https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+
 source ~/.zshrc
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-nvm install 10
+nvm install --lts
+nvm use --lts
 
-nvm alias default 10
-nvm use 10
+echo "node installed!"
 
-npm install -g ndb lock-cli commitizen standard avn avn-nvm avn-n vaca
-avn setup
 
-nvm install 8 --reinstall-packages-from=10
-avn setup

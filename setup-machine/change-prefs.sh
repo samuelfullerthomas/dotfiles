@@ -15,6 +15,7 @@ sudo nvram SystemAudioVolume=" "
 # defaults write com.apple.universalaccess closeViewZoomFollowsFocus -bool true
 
 # Set the screenshots folder to the cloud
+mkdir /Users/$USER/Documents/Screenshots
 defaults write com.apple.screencapture location /Users/$USER/Documents/Screenshots
 
 # Set a fast keyboard repeat rate
@@ -29,9 +30,6 @@ defaults write NSGlobalDomain com.apple.mouse.scaling -float 3
 
 # global trackpad tracking speed (1...5)
 defaults write NSGlobalDomain com.apple.trackpad.scaling -int 3
-
-# Add bluetooth icon to menu
-open '/System/Library/CoreServices/Menu Extras/Bluetooth.menu'
 
 
 

@@ -1,5 +1,6 @@
 SSH_ENV="$HOME/.ssh/environment"
 [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
+[[ -s "$HOME/.gvm/scripts/gvm" ]] && source "$HOME/.gvm/scripts/gvm"
 
 function start_agent {
     echo "Initialising new SSH agent..."
@@ -47,6 +48,10 @@ export SSH_KEY_PATH="~/.ssh/rsa_id"
 # github
 export GITHUB_TOKEN="319f4b79fecb87a2bdfeed98d9467d009f260116"
 export OCTO_LINKER_TOKEN="78a2df7236777db2559ffdf9036a0e5774125469"
+export XDG_DATA_HOM="$HOME/.local/share"
+
+# java
+export CPPFLAGS="-I/usr/local/opt/openjdk@11/include"
 
 # functions
 function repeatspeed () {
@@ -60,9 +65,23 @@ function killport () {
 }
 
 function killp () {
-  pgrep $1 | xargs kill -9
+  sudo pgrep $1 | sudo xargs kill -9
   pgrep $1
   echo "so much blood."
+}
+
+function git-temp-ignore () {
+  git update-index --skip-worktree $1
+  echo "ignoring $1."
+}
+
+function git-temp-unignore () {
+  git update-index --no-skip-worktree $1
+  echo "no longer ignoring $1."
+}
+
+function gcm () {
+  git commit -a -m "$1"
 }
 
 function gitconfig () {
@@ -110,6 +129,14 @@ function catp() {
   grep $1 ./package.json
 }
 
+# # automatically use node version
+function cd() {
+  builtin cd "$@"
+  if [[ -f .nvmrc ]]; then
+    nvm use
+  fi
+}
+
 # iterm
 source ~/.iterm2_shell_integration.zsh
 
@@ -142,14 +169,10 @@ alias mvb-npmrc='mv ~/.npmrc-temp ~/.npmrc'
 alias zsh="code ~/.zshrc"
 alias zshrc="code ~/.zshrc"
 alias nap="pmset sleepnow"
-alias killrim="killp Rim"
+alias gcam="git commit -a -m"
+
 # docker
 alias cleanup='brew cleanup && docker system prune'
-
-# nvm
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 eval "$(rbenv init -)"
 
@@ -161,6 +184,8 @@ parse_git_branch() {
 	fi
 	git branch 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/(\1$hasmod)/"
 }
+
+export GOPATH="$HOME/go"
 
 export PS1="%~%{%F{green}%} \$(parse_git_branch) $ %{%F{white}%}"
 # %T	System time (HH:MM).
@@ -177,13 +202,27 @@ export PS1="%~%{%F{green}%} \$(parse_git_branch) $ %{%F{white}%}"
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
-[[ -s "$HOME/.avn/bin/avn.sh" ]] && source "$HOME/.avn/bin/avn.sh" # load avn
-
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/samthomas/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/samthomas/google-cloud-sdk/path.zsh.inc'; fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f '/Users/samthomas/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/samthomas/google-cloud-sdk/completion.zsh.inc'; fi
-
+export PATH="$GOPATH/bin:$PATH"
 export PATH="$HOME/.dotnet/tools:$PATH"
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+export PATH="$HOME/Library/Python/3.9/bin:$PATH"
+
+# nvm
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+export PATH="/usr/local/opt/openjdk@11/bin:$PATH"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/samuel/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/samuel/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/samuel/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/samuel/google-cloud-sdk/completion.zsh.inc'; fi
+
+# pnpm
+export PNPM_HOME="/Users/samuel/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

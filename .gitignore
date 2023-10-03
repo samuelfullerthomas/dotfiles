@@ -5,8 +5,10 @@
 !.zshrc
 !.gitignore
 !.gitconfig.personal
-!.gitconfig.trainline
+!.gitconfig.coveo
 !.gitignore_global
 !.vim
 !.vimrc
 !README.md
+!.sleep
+!.wake

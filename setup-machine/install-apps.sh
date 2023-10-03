@@ -1,39 +1,36 @@
 #!/bin/sh
-echo 'installing brew...'
-
-# install brew
-if test ! $(which brew); then
-  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-fi
-
-brew update
-brew upgrade
-brew cleanup
-
-export HOMEBREW_CASK_OPTS="--appdir=/Applications"
-
 # utils
-brew install daisydisk
-brew install viscosity
-brew install kap
-brew install muzzle
+echo "installing apps..."
 brew install private-internet-access
+brew install daisydisk
+brew install muzzle
 brew install authy
-brew install sequel-pro
+brew install sequel-ace
+brew install handbrake
+brew install blueutil
+brew install sleepwatcher
+brew install bitwarden
+brew install gifski
+brew install gpg-suite
 
 # browsers
+echo "installing browsers..."
 brew install homebrew/cask-versions/firefox-developer-edition
 brew install google-chrome
 
 # dev
+echo "installing dev apps..."
 brew install iterm2
 #brew install virtualbox
 
 # editors
 brew install visual-studio-code
+brew install slack
 
 # fun
-brew install slack
+echo "installing fun? apps..."
 brew install spotify
 brew install vlc
 brew install vnc-viewer
+brew install bear
+brew install skype
