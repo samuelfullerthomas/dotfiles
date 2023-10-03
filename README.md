@@ -73,6 +73,13 @@ private internet access
 docker for mac
 photoshop
 
+sleepwatcher
+
+I use sleepwatcher () to manage a single thing on sleep and wakeup - turning off bluetooth! I have bluetooth headphones and they sometimes connect at annoying times to the computer, so I use sleepwatcher to turn off bluetooth when the computer goes to sleep, and turn it back on when it wakes up.
+
+I learned about it here:
+https://www.kodiakskorner.com/log/258
+
 ### Things to install manually
 
 https://cloud.google.com/sdk/docs/quickstart-macos
@@ -93,7 +100,7 @@ macos apps not on brew, but in the app store:
 
 plash: https://apps.apple.com/gb/app/plash/id1494023538?mt=12
 
-plash website is: https://time.pablopunk.com?seconds&fg=white&bg=transparent&position=bottom-right
+plash website for displaying the time on the homepage is: https://time.pablopunk.com?seconds&fg=white&bg=transparent&position=bottom-right
 
 gifski: https://apps.apple.com/gb/app/gifski/id1351639930?mt=12
 heic-converter: https://apps.apple.com/gb/app/heic-converter/id1294126402?mt=12

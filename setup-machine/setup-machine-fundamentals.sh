@@ -26,9 +26,3 @@ brew cleanup
 
 export HOMEBREW_CASK_OPTS="--appdir=/Applications"
 sudo chown -R $(whoami) $(brew --prefix)/*
-
-
-cd ~
-git remote add origin git@github.com:samuelfullerthomas/dotfiles.git
-git checkout -b master origin/master
-git pull

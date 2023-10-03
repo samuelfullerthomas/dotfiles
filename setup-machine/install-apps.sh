@@ -9,9 +9,14 @@ brew install sequel-ace
 brew install handbrake
 brew install blueutil
 brew install sleepwatcher
+
 brew install bitwarden
 brew install gifski
 brew install gpg-suite
+
+echo "setting up sleepwatcher to launch on startup..."
+ln -sfv /opt/homebrew/Cellar/sleepwatcher/2.2.1/homebrew.mxcl.sleepwatcher.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/homebrew.mxcl.sleepwatcher.plist
 
 # browsers
 echo "installing browsers..."
