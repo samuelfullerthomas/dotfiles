@@ -4,8 +4,7 @@
 !/setup-machine/
 !.zshrc
 !.gitignore
-!.gitconfig.personal
-!.gitconfig.coveo
+!.gitconfig.*
 !.gitignore_global
 !.vim
 !.vimrc
