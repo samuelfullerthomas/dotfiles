@@ -20,6 +20,12 @@ The linked git repo stores useful dot files and also this readme which lets me s
 
 This runs xcode install, installs brew, and generates an ssh key!
 
+Once you've added the ssh key to github:
+
+3. run `make tracking`
+
+This will make the repo track the remote and switch to the master branch
+
 ### Step 2
 
 1. run `make machine`

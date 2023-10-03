@@ -1,11 +1,13 @@
-.PHONY: machine bootstrap move
+.PHONY: machine bootstrap move tracking
 
 move:
 	./move-files.sh
 
 bootstrap:
 	./setup-machine-fundamentals.sh
-	./setup-ssh.sh
+
+tracking:
+	./setup-git-tracking.sh
 
 machine:
 	./setup-machine.sh
