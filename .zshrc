@@ -2,27 +2,6 @@ SSH_ENV="$HOME/.ssh/environment"
 [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
 [[ -s "$HOME/.gvm/scripts/gvm" ]] && source "$HOME/.gvm/scripts/gvm"
 
-function start_agent {
-    echo "Initialising new SSH agent..."
-    /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
-    echo succeeded
-    chmod 600 "${SSH_ENV}"
-    . "${SSH_ENV}" > /dev/null
-    /usr/bin/ssh-add;
-}
-
-# Source SSH settings, if applicable
-
-if [ -f "${SSH_ENV}" ]; then
-    . "${SSH_ENV}" > /dev/null
-    #ps ${SSH_AGENT_PID} doesn't work under cywgin
-    ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
-        start_agent;
-    }
-else
-    start_agent;
-fi
-
 # path
 export PATH=$HOME/bin:/usr/local/bin:$HOME/.cargo/bin:$HOME/.zshrc:$PATH:$PATH/usr/local/sbin:$PATH
 export ZSH_DISABLE_COMPFIX=true
@@ -129,12 +108,48 @@ function catp() {
   grep $1 ./package.json
 }
 
+function checkoutProfile() {
+  if [[ $currentDir == *"coveo"* ]] || [[ $currentDir == *"qubit"* ]]; then
+    gitconfig coveo
+  else
+      gitconfig personal
+  fi
+}
+
 # # automatically use node version
 function cd() {
+  WORK_REGEX=
   builtin cd "$@"
+  checkoutProfile
   if [[ -f .nvmrc ]]; then
     nvm use
   fi
+  if [[ -f .nvmrc ]]; then
+    say 'hi'
+  fi
+}
+
+function start_agent {
+    echo "Initialising new SSH agent..."
+    /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+    echo succeeded
+    chmod 600 "${SSH_ENV}"
+    . "${SSH_ENV}" > /dev/null
+    /usr/bin/ssh-add;
+}
+
+function onStartup {
+  # Source SSH settings, if applicable
+  if [ -f "${SSH_ENV}" ]; then
+      . "${SSH_ENV}" > /dev/null
+      #ps ${SSH_AGENT_PID} doesn't work under cywgin
+      ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
+          start_agent;
+      }
+  else
+      start_agent;
+  fi
+  checkoutProfile
 }
 
 # iterm
@@ -226,3 +241,7 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+
+# call startup function
+onStartup
