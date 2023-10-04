@@ -75,16 +75,17 @@ photoshop
 
 sleepwatcher
 
-I use sleepwatcher () to manage a single thing on sleep and wakeup - turning off bluetooth! I have bluetooth headphones and they sometimes connect at annoying times to the computer, so I use sleepwatcher to turn off bluetooth when the computer goes to sleep, and turn it back on when it wakes up.
+I use [sleepwatcher](https://www.bernhard-baehr.de/) to manage a single thing on sleep and wakeup - turning off bluetooth! I have bluetooth headphones and they sometimes connect at annoying times to the computer, so I use sleepwatcher to turn off bluetooth when the computer goes to sleep, and turn it back on when it wakes up.
 
 I learned about it here:
 https://www.kodiakskorner.com/log/258
 
 ### Things to install manually
 
+google cloud sdk
 https://cloud.google.com/sdk/docs/quickstart-macos
 
-setup iterm with profile & badge
+iterm setup with profile & badge
 
 see for color schemes:
 https://iterm2colorschemes.com
@@ -108,3 +109,8 @@ heic-converter: https://apps.apple.com/gb/app/heic-converter/id1294126402?mt=12
 gpg keys are located in:
 
 in the `backups` drive in icloud, password protected
+
+
+Desktop backgrounds:
+
+https://github.com/samuelfullerthomas/backgrounds
