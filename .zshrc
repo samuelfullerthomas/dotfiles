@@ -63,26 +63,6 @@ function gcm () {
   git commit -a -m "$1"
 }
 
-function gitconfig () {
-  if [ $# -eq 0 ] || [ $1 = "--help" ]; then
-    echo "usage:"
-    echo "gitconfig <profile> ------ switch to that profile"
-    echo "gitconfig --help    ------ print this help text"
-    echo "gitconfig --profiles  ------ show available profiles"
-  elif [ $1 = "--profiles" ]; then
-    echo "Available profiles:"
-    find $HOME/.gitconfig.* | awk -F "." '{print $3}'
-  elif [ -f "$HOME/.gitconfig.$1" ]; then
-    rm $HOME/.gitconfig
-    cp $HOME/.gitconfig.$1 $HOME/.gitconfig
-    echo "Now using $1 config as .gitconfig"
-  else
-    echo "$HOME/.gitconfig.$1 not found"
-    echo "Available profiles:"
-    find $HOME/.gitconfig.* | awk -F "." '{print $3}'
-  fi
-}
-
 function openpr() {
   github_url=`git remote -v | awk '/fetch/{print $2}' | sed -Ee 's#(git@|git://)#https://#' -e 's@com:@com/@' -e 's%\.git$%%' | awk '/github/'`;
   branch_name=`git symbolic-ref HEAD | cut -d"/" -f 3,4`;
@@ -106,15 +86,6 @@ function catp() {
     grep -B $2 -A $2 $1 ./package.json
   fi
   grep $1 ./package.json
-}
-
-function checkoutProfile() {
-  currentDir=$(pwd)
-  if [[ $currentDir == *"coveo"* ]] || [[ $currentDir == *"qubit"* ]]; then
-    gitconfig coveo
-  else
-    gitconfig personal
-  fi
 }
 
 function reload() {
@@ -160,7 +131,7 @@ function onStartup {
 source ~/.iterm2_shell_integration.zsh
 
 iterm2_print_user_vars() {
-  iterm2_set_user_var profile $(egrep -o '[^[:space:]]+@[^[:space:]]+' ~/.gitconfig)
+  iterm2_set_user_var profile $(git config user.email)
   iterm2_set_user_var gitBranch $((git branch 2> /dev/null) | grep \* | cut -c3-)
 }
 
