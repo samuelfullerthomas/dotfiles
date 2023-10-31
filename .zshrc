@@ -109,18 +109,22 @@ function catp() {
 }
 
 function checkoutProfile() {
+  currentDir=$(pwd)
   if [[ $currentDir == *"coveo"* ]] || [[ $currentDir == *"qubit"* ]]; then
     gitconfig coveo
   else
-      gitconfig personal
+    gitconfig personal
   fi
+}
+
+function reload() {
+  source ~/.zshrc
 }
 
 # # automatically use node version
 function cd() {
   WORK_REGEX=
   builtin cd "$@"
-  checkoutProfile
   if [[ -f .nvmrc ]]; then
     nvm use
   fi
@@ -149,7 +153,7 @@ function onStartup {
   else
       start_agent;
   fi
-  checkoutProfile
+  # checkoutProfile
 }
 
 # iterm
@@ -166,7 +170,6 @@ alias zsh-functions="grep function ~/.zshrc"
 alias help="echo 'try the command zsh-aliases to show you available aliases, or zsh-functions to show you available functions\ntry entering env to see environment variables'"
 
 alias killchromium="pgrep Chromium | xargs kill -9"
-alias reload="source ~/.zshrc"
 alias clean-docker='docker system prune -a'
 alias gco="git checkout"
 alias gp="git push"
