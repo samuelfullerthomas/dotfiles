@@ -71,6 +71,10 @@ function openpr() {
   fi
 }
 
+function ape() {
+  git push -u && openpr
+}
+
 function grephelp() {
   echo "Before: -B: ex: grep -B 4 'keyword' /path/to/file.log"
   echo "After: -A: ex: grep -A 4 'keyword' /path/to/file.log"
@@ -93,15 +97,23 @@ function reload() {
   source ~/.zshrc
 }
 
-# # automatically use node version
+function checknode () {
+  if [[ -f ./package.json ]]; then
+    nodeversion=$(ggrep -oP '"node": "[><=~]{0,2}([0-9]{2})' package.json | ggrep -oP '[0-9]{2}')
+    if [[ -n "$nodeversion" ]]; then
+      nvm use $nodeversion
+    fi
+  fi
+}
+
+
+# automatically use node version
 function cd() {
   builtin cd "$@"
   if [[ -f .nvmrc ]]; then
     nvm use
   fi
-  if [[ -f .nvmrc ]]; then
-    say 'hi'
-  fi
+  checknode
 }
 
 function start_agent {
