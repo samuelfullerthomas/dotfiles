@@ -17,7 +17,10 @@
 	default = current
 [pull]
 	rebase = false
-[includeIf "gitdir:~/coveo/"]
-  path = .gitconfig.coveo
-[includeIf "gitdir:~/qubit/"]
-  path = .gitconfig.coveo
+[includeIf "gitdir:/Users/samuel/coveo/"]
+	path = /Users/samuel/.gitconfig.coveo
+[includeIf "gitdir:/Users/samuel/qubit/"]
+  path = /Users/samuel/.gitconfig.coveo
+[includeIf "gitdir:/Users/samuel/coveo-platoform/"]
+  path = /Users/samuel/.gitconfig.coveo
+

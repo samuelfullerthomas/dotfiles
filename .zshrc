@@ -75,6 +75,11 @@ function ape() {
   git push -u && openpr
 }
 
+function openjira () {
+  ticket=`git rev-parse --abbrev-ref HEAD`
+  open https://coveord.atlassian.net/browse/$ticket
+}
+
 function grephelp() {
   echo "Before: -B: ex: grep -B 4 'keyword' /path/to/file.log"
   echo "After: -A: ex: grep -A 4 'keyword' /path/to/file.log"
@@ -150,27 +155,25 @@ iterm2_print_user_vars() {
 # aliases
 alias zsh-aliases="grep alias ~/.zshrc"
 alias zsh-functions="grep function ~/.zshrc"
+alias zsh="code ~/.zshrc"
+alias zshrc="code ~/.zshrc"
 alias help="echo 'try the command zsh-aliases to show you available aliases, or zsh-functions to show you available functions\ntry entering env to see environment variables'"
 
 alias killchromium="pgrep Chromium | xargs kill -9"
 alias clean-docker='docker system prune -a'
+
 alias gco="git checkout"
 alias gp="git push"
 alias gpo="git push -u"
-alias steam='wine ~/.wine/drive_c/Program\ Files\ \(x86\)/Steam'
-alias winef='cd ~/.wine/drive_c/Program\ Files\ \(x86\)/'
-alias screenschots-folder='echo "defaults write com.apple.screencapture location <path here>"'
-alias lb="ssh root@209.97.141.227"
-alias server-ssh='ssh root@68.183.44.201'
-alias server-ip='echo 68.183.44.201'
+alias gcam="git commit -a -m"
+
+alias override-screenschots-folder='echo "defaults write com.apple.screencapture location <path here>"'
 alias delete-mail='echo "d *" | mail -N'
 alias git-lastme="git for-each-ref --format=' %(authorname) %09 %(refname) %(committerdate)' --sort=authorname --sort=-committerdate | grep 'Sam Thomas'"
 alias mv-npmrc='mv ~/.npmrc ~/.npmrc-temp'
 alias mvb-npmrc='mv ~/.npmrc-temp ~/.npmrc'
-alias zsh="code ~/.zshrc"
-alias zshrc="code ~/.zshrc"
+
 alias nap="pmset sleepnow"
-alias gcam="git commit -a -m"
 
 # docker
 alias cleanup='brew cleanup && docker system prune'
