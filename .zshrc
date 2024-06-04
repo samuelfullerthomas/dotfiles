@@ -62,10 +62,18 @@ function gcm () {
 }
 
 function openpr() {
+  if ! gh --version >/dev/null 2>&1; then
+    brew install gh
+  fi
+
+  if ! gh auth status >/dev/null 2>&1; then
+    gh auth login
+  fi
+
   if ! gh pr view --web >/dev/null 2>&1; then
     github_url=`git remote -v | awk '/fetch/{print $2}' | sed -Ee 's#(git@|git://)#https://#' -e 's@com:@com/@' -e 's%\.git$%%' | awk '/github/'`;
     branch_name=`git symbolic-ref HEAD | cut -d"/" -f 3,4`;
-    pr_url=$github_url"/compare/master..."$branch_name
+    pr_url=$github_url"/compare/master..."$branch_name"?quick_pull=1&template=commerce.md"
     open $pr_url;
     return
   fi
