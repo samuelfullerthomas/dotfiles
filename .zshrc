@@ -74,6 +74,7 @@ function openpr() {
     github_url=`git remote -v | awk '/fetch/{print $2}' | sed -Ee 's#(git@|git://)#https://#' -e 's@com:@com/@' -e 's%\.git$%%' | awk '/github/'`;
     branch_name=`git symbolic-ref HEAD | cut -d"/" -f 3,4`;
     pr_url=$github_url"/compare/master..."$branch_name"?quick_pull=1&template=commerce.md"
+    echo -n $branch_name | pbcopy
     open $pr_url;
     return
   fi
@@ -177,7 +178,7 @@ alias gcam="git commit -a -m"
 
 alias override-screenschots-folder='echo "defaults write com.apple.screencapture location <path here>"'
 alias delete-mail='echo "d *" | mail -N'
-alias git-lastme="git for-each-ref --format=' %(authorname) %09 %(refname) %(committerdate)' --sort=authorname --sort=-committerdate | grep 'Sam Thomas'"
+alias git-lastme="git for-each-ref --format=' %(authorname) %09 %(refname) %(committerdate)' --sort=authorname --sort=-committerdate | grep 'Sam Thomas' --max-count 10"
 alias mv-npmrc='mv ~/.npmrc ~/.npmrc-temp'
 alias mvb-npmrc='mv ~/.npmrc-temp ~/.npmrc'
 

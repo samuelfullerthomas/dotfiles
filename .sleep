@@ -1,2 +1,2 @@
 #!/bin/bash
-$HOMEBREW_PREFIX/bin/blueutil -p 0
+/opt/homebrew/bin/blueutil -p 0
