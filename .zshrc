@@ -30,6 +30,9 @@ export XDG_DATA_HOM="$HOME/.local/share"
 # java
 export CPPFLAGS="-I/usr/local/opt/openjdk@11/include"
 
+# granted
+export GRANTED_ALIAS_CONFIGURED="true"
+
 # functions
 function repeatspeed () {
   defaults write NSGlobalDomain KeyRepeat -int :$1
@@ -186,6 +189,9 @@ alias nap="pmset sleepnow"
 
 # docker
 alias cleanup='brew cleanup && docker system prune'
+
+# granted
+alias assume="source /opt/homebrew/bin/assume"
 
 eval "$(rbenv init -)"
 
