@@ -64,6 +64,11 @@ function gcm () {
   git commit -a -m "$1"
 }
 
+function gcom() {
+  main_branch_name=`git remote show origin | grep 'HEAD branch' | cut -d' ' -f5`;
+  git checkout $main_branch_name
+}
+
 function openpr() {
   if ! gh --version >/dev/null 2>&1; then
     brew install gh
@@ -76,7 +81,8 @@ function openpr() {
   if ! gh pr view --web >/dev/null 2>&1; then
     github_url=`git remote -v | awk '/fetch/{print $2}' | sed -Ee 's#(git@|git://)#https://#' -e 's@com:@com/@' -e 's%\.git$%%' | awk '/github/'`;
     branch_name=`git symbolic-ref HEAD | cut -d"/" -f 3,4`;
-    pr_url=$github_url"/compare/master..."$branch_name"?quick_pull=1&template=commerce.md"
+    main_branch_name=`git remote show origin | grep 'HEAD branch' | cut -d' ' -f5`;
+    pr_url=$github_url"/compare/"$main_branch_name"..."$branch_name"?quick_pull=1&template=commerce.md"
     echo -n $branch_name | pbcopy
     open $pr_url;
     return
@@ -186,12 +192,16 @@ alias mv-npmrc='mv ~/.npmrc ~/.npmrc-temp'
 alias mvb-npmrc='mv ~/.npmrc-temp ~/.npmrc'
 
 alias nap="pmset sleepnow"
+alias lock="pmset sleepnow"
 
 # docker
 alias cleanup='brew cleanup && docker system prune'
 
 # granted
 alias assume="source /opt/homebrew/bin/assume"
+
+# aws cli
+alias aws-auth="aws sso login --profile default && assume --export default"
 
 eval "$(rbenv init -)"
 
