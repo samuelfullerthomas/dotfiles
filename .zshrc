@@ -179,6 +179,7 @@ alias help="echo 'try the command zsh-aliases to show you available aliases, or 
 
 alias killchromium="pgrep Chromium | xargs kill -9"
 alias clean-docker='docker system prune -a'
+alias clean-coveo='~/coveo-platoform/commerce-service/scripts/createcatalog.py && ~/coveo-platoform/commerce-service/scripts/createsource.py  && ~/coveo-platoform/commerce-service/scripts/ft-testorg.py && ~/coveo-platoform/commerce-service/scripts/setup-testorg.py'
 
 alias gco="git checkout"
 alias gp="git push"
