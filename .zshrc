@@ -18,10 +18,10 @@ export GPG_TTY=$(tty)
 # resource ZSH
 source $ZSH/oh-my-zsh.sh
 
+# source iterm integration
+source ~/.iterm2_shell_integration.zsh
+
 # ssh
-export MEETUP_KEY=515927b636e132036c50656358641b
-export authId=MANDCWOWIXNTG2YZQXNT
-export authToken=MDBhNGQyNjA4NTU2ODIzZjQxMzc2M2FhY2Q2OGE1
 export SSH_KEY_PATH="~/.ssh/rsa_id"
 
 # github
@@ -32,6 +32,9 @@ export CPPFLAGS="-I/usr/local/opt/openjdk@11/include"
 
 # granted
 export GRANTED_ALIAS_CONFIGURED="true"
+
+# turbo
+export TURBO_NO_UPDATE_NOTIFIER=true
 
 # functions
 function repeatspeed () {
@@ -124,19 +127,29 @@ function checknode () {
   if [[ -f ./package.json ]]; then
     nodeversion=$(ggrep -oP '"node": "[><=~]{0,2}([0-9]{2})' package.json | ggrep -oP '[0-9]{2}')
     if [[ -n "$nodeversion" ]]; then
-      nvm use $nodeversion
+      current_version=$(node -v 2>/dev/null | sed 's/v//' | cut -d. -f1)
+      if [[ "$current_version" != "$nodeversion" ]]; then
+        echo "Switching from Node v$current_version to v$nodeversion"
+        nvm use $nodeversion
+      fi
     fi
   fi
 }
 
-
 # automatically use node version
 function cd() {
   builtin cd "$@"
+  
   if [[ -f .nvmrc ]]; then
-    nvm use
+    nvmrc_version=$(cat .nvmrc | tr -d '\n')
+    current_version=$(node -v 2>/dev/null | sed 's/v//')
+    if [[ "$current_version" != "$nvmrc_version" ]]; then
+      echo "Switching from Node v$current_version to v$nvmrc_version (from .nvmrc)"
+      nvm use
+    fi
+  else
+    checknode
   fi
-  checknode
 }
 
 function start_agent {
@@ -159,15 +172,58 @@ function onStartup {
   else
       start_agent;
   fi
-  # checkoutProfile
+  export PYENV_ROOT="$HOME/.pyenv"
+  [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init - zsh)"
+  nvm use
+  coveo_login
+}
+
+# coveo
+coveo_prepare() {
+  # login to aws sso & export credentials
+  aws sso login
+  assume --export default
+  assume --export dev
+  # cd into the admin-ui directory
+  cd ~/coveo-platform/admin-ui
+  # stash current changes
+  BRANCH_NAME=$(git branch --show-current)
+  git add .
+  git stash
+  # switch to master branch
+  git checkout master
+  # pull latest changes
+  git pull
+  # install dependencies & build
+  pnpm install
+  pnpm run build
+  pnpm run type-check --force
+  # switch back to original branch
+  git checkout $BRANCH_NAME
+  git stash pop
+}
+
+coveo_login () {
+  # login to aws sso & export credentials
+  aws sso login
+  assume --export default
+  assume --export dev
 }
 
 # iterm
-source ~/.iterm2_shell_integration.zsh
-
 iterm2_print_user_vars() {
   iterm2_set_user_var profile $(git config user.email)
   iterm2_set_user_var gitBranch $((git branch 2> /dev/null) | grep \* | cut -c3-)
+}
+
+# PS1 (prompt)
+parse_git_branch() {
+	hasmod=""
+	if [[ `git ls-files -dmo --exclude-standard 2> /dev/null` ]]; then
+		hasmod="*"
+	fi
+	git branch 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/(\1$hasmod)/"
 }
 
 # aliases
@@ -188,12 +244,12 @@ alias gcam="git commit -a -m"
 
 alias override-screenschots-folder='echo "defaults write com.apple.screencapture location <path here>"'
 alias delete-mail='echo "d *" | mail -N'
-alias git-lastme="git for-each-ref --format=' %(authorname) %09 %(refname) %(committerdate)' --sort=authorname --sort=-committerdate | grep 'Sam Thomas' --max-count 10"
+alias git-lastme="git for-each-ref --format=' %(authorname) %09 %(refname) %(committerdate)' --sort=authorname --sort=-committerdate | grep 'Thomas' --max-count 10 | sed -E 's/.*refs\/(tags|heads|remotes\/origin)\/([^ ]+).*/\2/' | uniq"
 alias mv-npmrc='mv ~/.npmrc ~/.npmrc-temp'
 alias mvb-npmrc='mv ~/.npmrc-temp ~/.npmrc'
 
-alias nap="pmset sleepnow"
-alias lock="pmset sleepnow"
+alias nap="/opt/homebrew/bin/blueutil -p 0 && /bin/sleep 2 && /usr/bin/pmset sleepnow"
+alias lock="/opt/homebrew/bin/blueutil -p 0 && /bin/sleep 2 && /usr/bin/pmset sleepnow"
 
 # docker
 alias cleanup='brew cleanup && docker system prune'
@@ -204,19 +260,13 @@ alias assume="source /opt/homebrew/bin/assume"
 # aws cli
 alias aws-auth="aws sso login --profile default && assume --export default"
 
-eval "$(rbenv init -)"
+alias e2e-prepare="assume --export default && assume --export dev"
 
-# PS1 (prompt)
-parse_git_branch() {
-	hasmod=""
-	if [[ `git ls-files -dmo --exclude-standard 2> /dev/null` ]]; then
-		hasmod="*"
-	fi
-	git branch 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/(\1$hasmod)/"
-}
+eval "$(rbenv init -)"
 
 export GOPATH="$HOME/go"
 
+# prompt display
 export PS1="%~%{%F{green}%} \$(parse_git_branch) $ %{%F{white}%}"
 # %T	System time (HH:MM).
 # %*	System time (HH:MM:SS).
@@ -243,12 +293,6 @@ export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || pr
 export PATH="/usr/local/opt/openjdk@11/bin:$PATH"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/samuel/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/samuel/google-cloud-sdk/path.zsh.inc'; fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f '/Users/samuel/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/samuel/google-cloud-sdk/completion.zsh.inc'; fi
-
 # pnpm
 export PNPM_HOME="/Users/samuel/Library/pnpm"
 case ":$PATH:" in
@@ -260,3 +304,15 @@ esac
 
 # call startup function
 onStartup
+# The following lines have been added by Docker Desktop to enable Docker CLI completions.
+fpath=(/Users/samuel/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+# End of Docker CLI completions
+export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/samuel/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/samuel/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/samuel/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/samuel/google-cloud-sdk/completion.zsh.inc'; fi
