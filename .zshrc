@@ -163,7 +163,7 @@ function start_agent {
 
 function onStartup {
   # Source SSH settings, if applicable
-  if [ -f "${SSH_ENV}" ]; then
+  if [[ -f "${SSH_ENV}" ]]; then
       . "${SSH_ENV}" > /dev/null
       #ps ${SSH_AGENT_PID} doesn't work under cywgin
       ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
@@ -175,7 +175,7 @@ function onStartup {
   export PYENV_ROOT="$HOME/.pyenv"
   [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
   eval "$(pyenv init - zsh)"
-  nvm use
+  nvm use default
   coveo_login
 }
 
@@ -205,10 +205,16 @@ coveo_prepare() {
 }
 
 coveo_login () {
-  # login to aws sso & export credentials
-  aws sso login
-  assume --export default
-  assume --export dev
+  # Check if AWS token is valid
+  if ! aws sts get-caller-identity > /dev/null 2>&1; then
+    echo "AWS token is invalid or expired. Logging in..."
+    # Login to AWS SSO & export credentials
+    aws sso login
+    assume --export default
+    assume --export dev
+  else
+    echo "AWS token is valid. No need to log in."
+  fi
 }
 
 # iterm
