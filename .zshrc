@@ -2,8 +2,11 @@ SSH_ENV="$HOME/.ssh/environment"
 [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
 [[ -s "$HOME/.gvm/scripts/gvm" ]] && source "$HOME/.gvm/scripts/gvm"
 
+# Load local secrets (not committed to version control)
+[[ -f "$HOME/.local-secrets" ]] && source "$HOME/.local-secrets"
+
 # path
-export PATH=$HOME/bin:/usr/local/bin:$HOME/.cargo/bin:$HOME/.zshrc:$PATH:$PATH/usr/local/sbin:$PATH
+export PATH=$HOME/bin:/usr/local/bin:$HOME/.cargo/bin:/usr/local/sbin:$PATH
 export ZSH_DISABLE_COMPFIX=true
 # path to oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
@@ -15,17 +18,17 @@ ZSH_THEME="cloud"
 # https://github.com/keybase/keybase-issues/issues/2798
 export GPG_TTY=$(tty)
 
-# resource ZSH
+# source ZSH
 source $ZSH/oh-my-zsh.sh
 
-# source iterm integration
-source ~/.iterm2_shell_integration.zsh
+# source iterm integration (conditional load is at end of file)
+# source ~/.iterm2_shell_integration.zsh
 
 # ssh
-export SSH_KEY_PATH="~/.ssh/rsa_id"
+export SSH_KEY_PATH="$HOME/.ssh/rsa_id"
 
-# github
-export XDG_DATA_HOM="$HOME/.local/share"
+# XDG base directory
+export XDG_DATA_HOME="$HOME/.local/share"
 
 # java
 export CPPFLAGS="-I/usr/local/opt/openjdk@11/include"
@@ -36,10 +39,20 @@ export GRANTED_ALIAS_CONFIGURED="true"
 # turbo
 export TURBO_NO_UPDATE_NOTIFIER=true
 
+# coveo token (lazy loaded - call coveo_token to set it)
+coveo_token() {
+  export COVEO_TOKEN=$(coveo config:get accessToken | jq -r .accessToken)
+  echo "COVEO_TOKEN set"
+}
+
 # functions
 function repeatspeed () {
-  defaults write NSGlobalDomain KeyRepeat -int :$1
+  defaults write NSGlobalDomain KeyRepeat -int $1
   echo "hows that speed for ya."
+}
+
+function gh-checks-watch () {
+  gh pr checks --watch --fail-fast
 }
 
 function killport () {
@@ -48,8 +61,8 @@ function killport () {
 }
 
 function killp () {
-  sudo pgrep $1 | sudo xargs kill -9
-  pgrep $1
+  pgrep "$1" | xargs sudo kill -9
+  pgrep "$1"
   echo "so much blood."
 }
 
@@ -61,10 +74,6 @@ function git-temp-ignore () {
 function git-temp-unignore () {
   git update-index --no-skip-worktree $1
   echo "no longer ignoring $1."
-}
-
-function gcm () {
-  git commit -a -m "$1"
 }
 
 function gcom() {
@@ -85,7 +94,14 @@ function openpr() {
     github_url=`git remote -v | awk '/fetch/{print $2}' | sed -Ee 's#(git@|git://)#https://#' -e 's@com:@com/@' -e 's%\.git$%%' | awk '/github/'`;
     branch_name=`git symbolic-ref HEAD | cut -d"/" -f 3,4`;
     main_branch_name=`git remote show origin | grep 'HEAD branch' | cut -d' ' -f5`;
-    pr_url=$github_url"/compare/"$main_branch_name"..."$branch_name"?quick_pull=1&template=commerce.md"
+    
+    # Only add commerce template for admin-ui repo
+    template_param=""
+    if [[ "$github_url" == *"admin-ui"* ]]; then
+      template_param="&template=commerce.md"
+    fi
+    
+    pr_url=$github_url"/compare/"$main_branch_name"..."$branch_name"?quick_pull=1"$template_param
     echo -n $branch_name | pbcopy
     open $pr_url;
     return
@@ -112,15 +128,85 @@ function grepp() {
 
 function catp() {
   if [ $# -eq 0 ]; then
-    echo 'catp usage: catp <term> <padding lines>'
+    echo 'catp usage: catp <term> [padding lines]'
+    return 1
   elif [ $# -eq 2 ]; then
     grep -B $2 -A $2 $1 ./package.json
+    return
   fi
   grep $1 ./package.json
 }
 
 function reload() {
   source ~/.zshrc
+}
+
+# ===== Utility Functions =====
+
+# Make directory and cd into it
+mkcd() {
+  mkdir -p "$1" && cd "$1"
+}
+
+# Quick file search by name
+ff() {
+  find . -name "*$1*" 2>/dev/null
+}
+
+# Universal archive extractor
+extract() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: extract <archive>"
+    return 1
+  fi
+  if [[ ! -f "$1" ]]; then
+    echo "'$1' is not a valid file"
+    return 1
+  fi
+  case "$1" in
+    *.tar.bz2) tar xjf "$1" ;;
+    *.tar.gz)  tar xzf "$1" ;;
+    *.tar.xz)  tar xJf "$1" ;;
+    *.bz2)     bunzip2 "$1" ;;
+    *.rar)     unrar x "$1" ;;
+    *.gz)      gunzip "$1" ;;
+    *.tar)     tar xf "$1" ;;
+    *.tbz2)    tar xjf "$1" ;;
+    *.tgz)     tar xzf "$1" ;;
+    *.zip)     unzip "$1" ;;
+    *.Z)       uncompress "$1" ;;
+    *.7z)      7z x "$1" ;;
+    *)         echo "'$1' cannot be extracted via extract()" ;;
+  esac
+}
+
+# Git stash with a message
+gss() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: gss <stash message>"
+    return 1
+  fi
+  git stash push -m "$1"
+}
+
+# Create directory and cd, or clone git repo and cd
+take() {
+  if [[ $1 =~ ^(https?|git).*\.git$ ]]; then
+    git clone "$1" && cd "$(basename "$1" .git)"
+  else
+    mkcd "$1"
+  fi
+}
+
+# Show listening ports
+ports() {
+  lsof -iTCP -sTCP:LISTEN -n -P
+}
+
+# Quick weather check
+weather() {
+  local city="${1:-}"
+  curl -s "wttr.in/${city}?format=3"
 }
 
 function checknode () {
@@ -161,24 +247,6 @@ function start_agent {
     /usr/bin/ssh-add;
 }
 
-function onStartup {
-  # Source SSH settings, if applicable
-  if [[ -f "${SSH_ENV}" ]]; then
-      . "${SSH_ENV}" > /dev/null
-      #ps ${SSH_AGENT_PID} doesn't work under cywgin
-      ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
-          start_agent;
-      }
-  else
-      start_agent;
-  fi
-  export PYENV_ROOT="$HOME/.pyenv"
-  [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-  eval "$(pyenv init - zsh)"
-  nvm use default
-  coveo_login
-}
-
 # coveo
 coveo_prepare() {
   # login to aws sso & export credentials
@@ -205,31 +273,90 @@ coveo_prepare() {
 }
 
 coveo_login () {
-  # Check if AWS token is valid
-  if ! aws sts get-caller-identity > /dev/null 2>&1; then
-    echo "AWS token is invalid or expired. Logging in..."
-    # Login to AWS SSO & export credentials
+  local token_file="$HOME/.aws/token_age"
+  local max_age=$((8 * 60 * 60))  # 8 hours in seconds
+  local needs_login=false
+
+  # Check if token file exists and is within 8 hours
+  if [[ -f "$token_file" ]]; then
+    local token_time=$(cat "$token_file")
+    local current_time=$(date +%s)
+    local age=$((current_time - token_time))
+    if [[ $age -ge $max_age ]]; then
+      echo "AWS token is older than 8 hours. Logging in..."
+      needs_login=true
+    else
+      local remaining=$(((max_age - age) / 60))
+      echo "AWS token is valid. ${remaining} minutes remaining."
+    fi
+  else
+    echo "No token timestamp found. Logging in..."
+    needs_login=true
+  fi
+
+  if [[ "$needs_login" == true ]]; then
     aws sso login
     assume --export default
     assume --export dev
-  else
-    echo "AWS token is valid. No need to log in."
+    # Record login timestamp
+    date +%s > "$token_file"
   fi
 }
 
 # iterm
 iterm2_print_user_vars() {
-  iterm2_set_user_var profile $(git config user.email)
-  iterm2_set_user_var gitBranch $((git branch 2> /dev/null) | grep \* | cut -c3-)
+  iterm2_set_user_var profile "$(git config user.email)"
+  iterm2_set_user_var gitBranch "$(git branch 2> /dev/null | grep \* | cut -c3-)"
 }
 
 # PS1 (prompt)
 parse_git_branch() {
-	hasmod=""
-	if [[ `git ls-files -dmo --exclude-standard 2> /dev/null` ]]; then
-		hasmod="*"
-	fi
-	git branch 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/(\1$hasmod)/"
+  hasmod=""
+  if [[ `git ls-files -dmo --exclude-standard 2> /dev/null` ]]; then
+    hasmod="*"
+  fi
+  git branch 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/(\1$hasmod)/"
+}
+
+function onStartup {
+  # Source SSH settings, if applicable
+  if [[ -f "${SSH_ENV}" ]]; then
+      . "${SSH_ENV}" > /dev/null
+      #ps ${SSH_AGENT_PID} doesn't work under cywgin
+      ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
+          start_agent;
+      }
+  else
+      start_agent;
+  fi
+  export PYENV_ROOT="$HOME/.pyenv"
+  [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init - zsh)"
+  nvm use default
+
+  # Update opencode once per day
+  local opencode_update_file="$HOME/.opencode_last_update"
+  local max_age=$((24 * 60 * 60))  # 24 hours in seconds
+  local should_update=false
+
+  if [[ -f "$opencode_update_file" ]]; then
+    local last_update=$(cat "$opencode_update_file")
+    local current_time=$(date +%s)
+    local age=$((current_time - last_update))
+    if [[ $age -ge $max_age ]]; then
+      should_update=true
+    fi
+  else
+    should_update=true
+  fi
+
+  if [[ "$should_update" == true ]]; then
+    echo "Checking for opencode updates..."
+    npm update -g opencode
+    date +%s > "$opencode_update_file"
+  fi
+
+  coveo_login
 }
 
 # aliases
@@ -238,19 +365,27 @@ alias zsh-functions="grep function ~/.zshrc"
 alias zsh="code ~/.zshrc"
 alias zshrc="code ~/.zshrc"
 alias help="echo 'try the command zsh-aliases to show you available aliases, or zsh-functions to show you available functions\ntry entering env to see environment variables'"
+alias opencode-config="code ~/.config/opencode"
 
 alias killchromium="pgrep Chromium | xargs kill -9"
 alias clean-docker='docker system prune -a'
-alias clean-coveo='~/coveo-platoform/commerce-service/scripts/createcatalog.py && ~/coveo-platoform/commerce-service/scripts/createsource.py  && ~/coveo-platoform/commerce-service/scripts/ft-testorg.py && ~/coveo-platoform/commerce-service/scripts/setup-testorg.py'
+alias clean-coveo='~/coveo-platform/commerce-service/scripts/createcatalog.py && ~/coveo-platform/commerce-service/scripts/createsource.py  && ~/coveo-platform/commerce-service/scripts/ft-testorg.py && ~/coveo-platform/commerce-service/scripts/setup-testorg.py'
 
 alias gco="git checkout"
 alias gp="git push"
 alias gpo="git push -u"
 alias gcam="git commit -a -m"
+alias glog="git log --oneline --graph --decorate -20"
 
-alias override-screenschots-folder='echo "defaults write com.apple.screencapture location <path here>"'
+# Show last X commits (default 10)
+glast() {
+  local count="${1:-10}"
+  git --no-pager log --oneline -n "$count"
+}
+
+alias override-screenshots-folder='echo "defaults write com.apple.screencapture location <path here>"'
 alias delete-mail='echo "d *" | mail -N'
-alias git-lastme="git for-each-ref --format=' %(authorname) %09 %(refname) %(committerdate)' --sort=authorname --sort=-committerdate | grep 'Thomas' --max-count 10 | sed -E 's/.*refs\/(tags|heads|remotes\/origin)\/([^ ]+).*/\2/' | uniq"
+alias git-lastme="git for-each-ref --format=' %(authorname) %09 %(refname) %(committerdate)' --sort=authorname --sort=-committerdate | grep \"\$(git config user.name)\" --max-count 10 | sed -E 's/.*refs\/(tags|heads|remotes\/origin)\/([^ ]+).*/\2/' | uniq"
 alias mv-npmrc='mv ~/.npmrc ~/.npmrc-temp'
 alias mvb-npmrc='mv ~/.npmrc-temp ~/.npmrc'
 
@@ -300,7 +435,7 @@ export PATH="/usr/local/opt/openjdk@11/bin:$PATH"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # pnpm
-export PNPM_HOME="/Users/samuel/Library/pnpm"
+export PNPM_HOME="$HOME/Library/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
@@ -322,3 +457,10 @@ if [ -f '/Users/samuel/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/samuel/g
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/Users/samuel/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/samuel/google-cloud-sdk/completion.zsh.inc'; fi
+
+# zoxide - smarter cd command (install with: brew install zoxide)
+# Use 'z' to jump to directories, e.g., 'z admin' -> ~/coveo-platform/admin-ui
+eval "$(zoxide init zsh)"
+
+
+. "$HOME/.local/share/../bin/env"
