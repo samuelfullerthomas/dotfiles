@@ -33,9 +33,6 @@ export XDG_DATA_HOME="$HOME/.local/share"
 # java
 export CPPFLAGS="-I/usr/local/opt/openjdk@11/include"
 
-# granted
-export GRANTED_ALIAS_CONFIGURED="true"
-
 # turbo
 export TURBO_NO_UPDATE_NOTIFIER=true
 
@@ -251,8 +248,6 @@ function start_agent {
 coveo_prepare() {
   # login to aws sso & export credentials
   aws sso login
-  assume --export default
-  assume --export dev
   # cd into the admin-ui directory
   cd ~/coveo-platform/admin-ui
   # stash current changes
@@ -296,8 +291,6 @@ coveo_login () {
 
   if [[ "$needs_login" == true ]]; then
     aws sso login
-    assume --export default
-    assume --export dev
     # Record login timestamp
     date +%s > "$token_file"
   fi
@@ -395,16 +388,10 @@ alias lock="/opt/homebrew/bin/blueutil -p 0 && /bin/sleep 2 && /usr/bin/pmset sl
 # docker
 alias cleanup='brew cleanup && docker system prune'
 
-# granted
-alias assume="source /opt/homebrew/bin/assume"
-
-# aws cli
-alias aws-auth="aws sso login --profile default && assume --export default"
-
-alias e2e-prepare="assume --export default && assume --export dev"
-
+# ruby
 eval "$(rbenv init -)"
 
+# go
 export GOPATH="$HOME/go"
 
 # prompt display

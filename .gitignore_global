@@ -1,5 +1,6 @@
 # Node
 npm-debug.log
+node_modules
 
 # Mac
 .DS_Store
@@ -7,6 +8,6 @@ npm-debug.log
 #vs code
 .vscode
 
-#Random folders
-stuff
+#other folders
 .cache
+.local-secrets
