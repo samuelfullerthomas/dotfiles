@@ -28,17 +28,21 @@ fi
 
 cd "$HOME/setup-machine"
 
-# 4. Generate SSH key
-echo "Generating SSH key..."
-ssh-keygen -t ed25519 -C "sft89@pm.me"
-eval "$(ssh-agent -s)"
-mkdir -p ~/.ssh
-cat <<EOF > ~/.ssh/config
+# 4. Generate SSH key (skip if one already exists)
+if [ -f "$HOME/.ssh/id_ed25519" ]; then
+  echo "SSH key already exists at ~/.ssh/id_ed25519, skipping generation."
+else
+  echo "Generating SSH key..."
+  ssh-keygen -t ed25519 -C "sft89@pm.me"
+  mkdir -p ~/.ssh
+  cat <<EOF > ~/.ssh/config
 Host github.com
 	AddKeysToAgent yes
 	UseKeychain yes
 	IdentityFile ~/.ssh/id_ed25519
 EOF
+fi
+eval "$(ssh-agent -s)"
 ssh-add --apple-use-keychain ~/.ssh/id_ed25519
 pbcopy < ~/.ssh/id_ed25519.pub
 echo ""
