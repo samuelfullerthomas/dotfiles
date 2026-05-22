@@ -1,0 +1,8 @@
+#!/bin/bash
+git for-each-ref --sort=-committerdate \
+  --format='%(committerdate:short) %(refname:short) %(if)%(upstream)%(then)REMOTE%(else)LOCAL%(end)' \
+  refs/heads/ | awk -v d="$(date -v-7d +%Y-%m-%d)" '
+  $1 >= d {
+    if ($NF == "REMOTE") printf "\033[32m%s\033[0m\n", $0
+    else printf "\033[33m%s\033[0m\n", $0
+  }'

@@ -1,15 +1,19 @@
-.PHONY: machine bootstrap move tracking
+.PHONY: all bootstrap apps dotfiles prefs
 
-move:
-	./move-files.sh
+all: bootstrap apps dotfiles prefs
 
+# First-time setup: SSH key, Xcode, Homebrew
 bootstrap:
 	./setup-machine-fundamentals.sh
 
-tracking:
-	./setup-git-tracking.sh
+# Install all apps/tools via Brewfile
+apps:
+	brew bundle --file=Brewfile
 
-machine:
-	./setup-machine.sh
-	rm ~/.gitconfig
-	cp ~/.gitconfig.personal ~/.gitconfig
+# Symlink dotfiles into ~ via stow
+dotfiles:
+	cd dotfiles && stow --adopt --target=$(HOME) git bin vim shell
+
+# macOS preferences
+prefs:
+	./change-prefs.sh

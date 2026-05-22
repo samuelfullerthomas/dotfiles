@@ -1,0 +1,91 @@
+# Taps
+tap "atlassian/acli"
+tap "ankitpokhrel/jira-cli"
+tap "danielgtaylor/restish"
+tap "hashicorp/tap"
+tap "snyk/tap"
+
+# Core dev tools
+brew "git"
+brew "git-lfs"
+brew "git-filter-repo"
+brew "git-gui"
+brew "gh"
+brew "just"
+brew "lefthook"
+brew "stow"
+brew "tmux"
+brew "fzf"
+brew "ripgrep"
+brew "zoxide"
+brew "tree"
+brew "btop"
+
+# Languages & runtimes
+brew "fnm"
+brew "uv"
+brew "go"
+brew "ruby"
+brew "rbenv"
+brew "maven"
+brew "openjdk@21"
+
+# Cloud & infra
+brew "awscli"
+brew "hashicorp/tap/terraform"
+brew "terragrunt"
+brew "kubernetes-cli"
+brew "helm"
+brew "stern"
+brew "docker-credential-helper"
+brew "docker-credential-helper-ecr"
+
+# Networking & services
+brew "nginx"
+brew "redis"
+brew "dnsmasq"
+brew "mkcert"
+
+# CLI utilities
+brew "atlassian/acli/acli"
+brew "ankitpokhrel/jira-cli/jira-cli"
+cask "danielgtaylor/restish/restish"
+brew "snyk/tap/snyk"
+brew "jfrog-cli"
+brew "slackdump"
+brew "rename"
+brew "grep"
+brew "blueutil"
+brew "sleepwatcher"
+brew "pinentry-mac"
+
+# Media
+brew "ffmpeg"
+brew "imagemagick"
+brew "pngquant"
+brew "yt-dlp"
+
+# Casks - browsers
+cask "google-chrome"
+cask "firefox@developer-edition"
+
+# Casks - dev tools
+cask "visual-studio-code"
+cask "iterm2"
+cask "docker-desktop"
+cask "lens"
+
+# Casks - utilities
+cask "alt-tab"
+cask "bluesnooze"
+cask "daisydisk"
+cask "kap"
+cask "sequel-ace"
+
+# Casks - comms & media
+cask "discord"
+cask "spotify"
+cask "vlc"
+
+# Casks - network
+cask "viscosity"

@@ -1,28 +1,29 @@
-#!/bin/sh
+#!/bin/bash
+set -e
 
-echo 'generating an ssh key...'
+echo "Generating SSH key..."
 ssh-keygen -t ed25519 -C "sft89@pm.me"
 eval "$(ssh-agent -s)"
-echo "Host github.com\n\tAddKeysToAgent yes\n\tUseKeychain yes\n\tIdentityFile ~/.ssh/id_ed25519" > ~/.ssh/config
+cat <<EOF > ~/.ssh/config
+Host github.com
+	AddKeysToAgent yes
+	UseKeychain yes
+	IdentityFile ~/.ssh/id_ed25519
+EOF
 ssh-add --apple-use-keychain ~/.ssh/id_ed25519
 pbcopy < ~/.ssh/id_ed25519.pub
-echo "ssh key generated and copied to cliboard! add it to https://github.com/settings/ssh/new now while xcode installs!"
+echo "SSH key copied to clipboard! Add it to https://github.com/settings/ssh/new"
 
-#install xcode
-echo 'installing xcode...'
-xcode-select --install
+# Xcode CLI tools
+echo "Installing Xcode CLI tools..."
+xcode-select --install 2>/dev/null || true
 
-#install hombrew
-echo 'installing brew...'
-
-# install brew
-if test ! $(which brew); then
-  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+# Homebrew
+if ! command -v brew &>/dev/null; then
+  echo "Installing Homebrew..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
 brew update
-brew upgrade
-brew cleanup
-
-export HOMEBREW_CASK_OPTS="--appdir=/Applications"
-sudo chown -R $(whoami) $(brew --prefix)/*
+echo "Homebrew ready."

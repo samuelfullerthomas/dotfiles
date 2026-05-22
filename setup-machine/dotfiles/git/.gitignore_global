@@ -1,0 +1,13 @@
+# Node
+npm-debug.log
+node_modules
+
+# Mac
+.DS_Store
+
+#vs code
+.vscode
+
+#other folders
+.cache
+.local-secrets

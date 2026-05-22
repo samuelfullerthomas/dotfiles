@@ -1,116 +1,71 @@
-# Misleading named dotfiles
+# Dotfiles
 
-![img](https://user-images.githubusercontent.com/10165959/70323974-2bbf4280-1826-11ea-80fe-0649d87c9ae1.gif)
+Machine setup for macOS. Uses Homebrew, GNU Stow, and a Makefile.
 
-Hi! this is the home directory for this computer and it is also a fairly exclusive git repo
+## New Machine Setup
 
-The linked git repo stores useful dot files and also this readme which lets me setup a new machine to my preferred specifications. The setup-machine folder has a bunch of scripts that help me setup a new computer with a few simple commands! How sweet it that! Pretty sweet, is what.
+Open Terminal and run:
 
-## From scratch setup
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/samuelfullerthomas/dotfiles/master/setup-machine/bootstrap-new-machine.sh)"
+```
 
-### Step 0
+This installs Xcode CLI tools, Homebrew, clones the repo, generates an SSH key, and copies it to your clipboard.
 
-1. download and load the `dotfiles` repo onto the new machine via a thumb drive (easiest way to do it!)
-2. run `make move`
+Then add the key at https://github.com/settings/ssh/new and run:
 
-### Step 1
+```bash
+cd ~/setup-machine
+make all
+```
 
-1. cd into ~/setup-machine
-2. run `make bootstrap`
+## What `make all` does
 
-This runs xcode install, installs brew, and generates an ssh key!
+| Target | What it does |
+|--------|-------------|
+| `make bootstrap` | SSH key, Xcode CLI tools, Homebrew |
+| `make apps` | Install everything in the Brewfile |
+| `make dotfiles` | Symlink dotfiles into ~ via stow |
+| `make prefs` | Apply macOS preferences |
 
-Once you've added the ssh key to github:
+Run any target individually to update just that piece.
 
-3. run `make tracking`
+## Structure
 
-This will make the repo track the remote and switch to the master branch
+```
+setup-machine/
+├── Makefile
+├── Brewfile                    # Declarative app/tool installs
+├── bootstrap-new-machine.sh   # Curl this on a fresh machine
+├── setup-machine-fundamentals.sh
+├── change-prefs.sh            # macOS defaults
+├── iterm/                     # iTerm config + color schemes
+└── dotfiles/                  # Stow packages → symlinked into ~
+    ├── git/                   # .gitconfig, .gitconfig.coveo, etc.
+    ├── bin/                   # ~/.local/bin scripts (git-recent, git-lg)
+    ├── vim/                   # .vimrc, color scheme
+    └── shell/                 # .zshrc, .sleep, .wakeup
+```
 
-### Step 2
+## Adding new dotfiles
 
-1. run `make machine`
+1. Create the file in the appropriate stow package (mirror the ~ path)
+2. Run `make dotfiles` to symlink it
 
-this one will take a while, as it installs services, applications, and utilities
+Example: to track `~/.config/foo/bar.toml`:
+```bash
+mkdir -p dotfiles/foo/.config/foo
+mv ~/.config/foo/bar.toml dotfiles/foo/.config/foo/
+make dotfiles
+```
 
-### Web browsers
+## Manual steps
 
-Firefox developer version
-Google Chrome
+- GPG keys: restore from `backups` drive in iCloud (password protected)
+- iTerm: import profile from `iterm/default-profile-2023.json`
+- Desktop backgrounds: https://github.com/samuelfullerthomas/backgrounds
 
-### notes app
+## Sleepwatcher
 
-Bear
-
-### Terminal
-
-iTerm2
-
-### code editor
-
-VSCode
-
-### db explorer
-
-sequel pro
-
-### 2fa
-
-authy
-
-### disk managment
-
-daisy disk
-
-### chat
-
-slack
-
-### misc
-
-muzzle
-kap
-private internet access
-docker for mac
-photoshop
-
-sleepwatcher
-
-I use [sleepwatcher](https://www.bernhard-baehr.de/) to manage a single thing on sleep and wakeup - turning off bluetooth! I have bluetooth headphones and they sometimes connect at annoying times to the computer, so I use sleepwatcher to turn off bluetooth when the computer goes to sleep, and turn it back on when it wakes up.
-
-I learned about it here:
-https://www.kodiakskorner.com/log/258
-
-### Things to install manually
-
-google cloud sdk
-https://cloud.google.com/sdk/docs/quickstart-macos
-
-iterm setup with profile & badge
-
-see for color schemes:
-https://iterm2colorschemes.com
-
-see for profile setup:
-https://stackoverflow.com/questions/35211565/how-do-i-import-an-iterm2-profile
-
-the badge setup is:
-
-`\(user.gitBranch)\n signing as \(user.profile)`
-
-macos apps not on brew, but in the app store:
-
-plash: https://apps.apple.com/gb/app/plash/id1494023538?mt=12
-
-plash website for displaying the time on the homepage is: https://time.pablopunk.com?seconds&fg=white&bg=transparent&position=bottom-right
-
-gifski: https://apps.apple.com/gb/app/gifski/id1351639930?mt=12
-heic-converter: https://apps.apple.com/gb/app/heic-converter/id1294126402?mt=12
-
-gpg keys are located in:
-
-in the `backups` drive in icloud, password protected
-
-
-Desktop backgrounds:
-
-https://github.com/samuelfullerthomas/backgrounds
+Turns off Bluetooth on sleep, back on at wake (prevents headphone auto-connect).
+Managed via `.sleep` and `.wakeup` scripts + the `sleepwatcher` brew formula.
