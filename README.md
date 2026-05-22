@@ -61,7 +61,31 @@ make dotfiles
 
 ## Manual steps
 
-- GPG keys: restore from `backups` drive in iCloud (password protected)
+## GPG Keys
+
+Keys are stored in the `backups` drive in iCloud (password protected).
+
+To restore on a new machine:
+
+```bash
+# Import the keys
+gpg --import /path/to/backups/private-key.asc
+gpg --import /path/to/backups/public-key.asc
+
+# Trust the key (set to ultimate trust)
+gpg --edit-key 4EFD83FB40FABF3D
+# type: trust → 5 → y → quit
+
+# Verify it works
+echo "test" | gpg --clearsign
+
+# Tell git to use the GPG agent
+echo "pinentry-program /opt/homebrew/bin/pinentry-mac" > ~/.gnupg/gpg-agent.conf
+gpgconf --kill gpg-agent
+```
+
+Personal signing key: `4EFD83FB40FABF3D`
+Coveo signing key: `BC0D1F8B5143DF97`
 - iTerm: import profile from `iterm/default-profile-2023.json`
 - Desktop backgrounds: https://github.com/samuelfullerthomas/backgrounds
 
