@@ -358,9 +358,11 @@ function onStartup {
 # aliases
 alias zsh-aliases="grep alias ~/.zshrc"
 alias zsh-functions="grep function ~/.zshrc"
-alias zsh="code ~/.zshrc"
-alias zshrc="code ~/.zshrc"
+alias zsh="codium ~/.zshrc"
+alias zshrc="codium ~/.zshrc"
 alias help="echo 'try the command zsh-aliases to show you available aliases, or zsh-functions to show you available functions\ntry entering env to see environment variables'"
+alias code="codium"
+alias kiro-cli-trust="kiro-cli chat --trust-all-tools"
 
 alias killchromium="pgrep Chromium | xargs kill -9"
 alias clean-docker='docker system prune -a'

@@ -22,11 +22,9 @@ brew "tree"
 brew "btop"
 
 # Languages & runtimes
-brew "fnm"
+brew "nvm"
 brew "uv"
 brew "go"
-brew "ruby"
-brew "rbenv"
 brew "maven"
 brew "openjdk@21"
 
@@ -41,9 +39,6 @@ brew "docker-credential-helper"
 brew "docker-credential-helper-ecr"
 
 # Networking & services
-brew "nginx"
-brew "redis"
-brew "dnsmasq"
 brew "mkcert"
 
 # CLI utilities
@@ -70,7 +65,8 @@ cask "google-chrome"
 cask "firefox@developer-edition"
 
 # Casks - dev tools
-cask "visual-studio-code"
+cask "vscodium"
+cask "claude"
 cask "iterm2"
 cask "docker-desktop"
 cask "lens"
@@ -79,13 +75,17 @@ cask "lens"
 cask "alt-tab"
 cask "bluesnooze"
 cask "daisydisk"
-cask "kap"
 cask "sequel-ace"
+cask "vnc-viewer"
 
 # Casks - comms & media
 cask "discord"
 cask "spotify"
 cask "vlc"
+
+# Casks - notes & writing
+cask "obsidian"
+cask "bear"
 
 # Casks - network
 cask "viscosity"
