@@ -11,6 +11,11 @@ export PATH=$HOME/bin:/usr/local/bin:$HOME/.cargo/bin:/usr/local/sbin:$HOME/.loc
 export ZSH_DISABLE_COMPFIX=true
 # path to oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
+# path to pnpm bin
+export PATH="$HOME/Library/pnpm:$PATH"
+
+export HUSKY_ENABLED=1 
+export HUSKY_TESTS_ENABLED=1
 
 # theme
 ZSH_THEME="cloud"
@@ -21,6 +26,9 @@ export GPG_TTY=$(tty)
 
 # source ZSH
 source $ZSH/oh-my-zsh.sh
+
+# source koviro wrapper
+source ~/coveo-platform/koviro/scripts/koviro.sh
 
 # source iterm integration (conditional load is at end of file)
 # source ~/.iterm2_shell_integration.zsh
@@ -96,12 +104,15 @@ function openpr() {
     # Only add commerce template for admin-ui repo
     template_param=""
     if [[ "$github_url" == *"admin-ui"* ]]; then
-      template_param="&template=commerce.md"
+      template_param="&template=commerce.md&labels=compliance-check,run-e2e"
     fi
     
     pr_url=$github_url"/compare/"$main_branch_name"..."$branch_name"?quick_pull=1"$template_param
     echo -n $branch_name | pbcopy
     open $pr_url;
+    if [[ "$github_url" == *"admin-ui"* ]]; then
+      echo "⚠️  Remember to add reviewer: gh pr edit <number> --add-reviewer coveo-platform/commerce-group-3"
+    fi
     return
   fi
 }
@@ -133,6 +144,11 @@ function catp() {
     return
   fi
   grep $1 ./package.json
+}
+
+function background() {
+  eval "$@" > /tmp/background-$$.log 2>&1 &
+  echo "Running in background (PID $!). Log: /tmp/background-$$.log"
 }
 
 function reload() {
@@ -358,10 +374,13 @@ function onStartup {
 # aliases
 alias zsh-aliases="grep alias ~/.zshrc"
 alias zsh-functions="grep function ~/.zshrc"
-alias zsh="code ~/.zshrc"
-alias zshrc="code ~/.zshrc"
+alias zsh="codium ~/.zshrc"
+alias zshrc="codium ~/.zshrc"
 alias help="echo 'try the command zsh-aliases to show you available aliases, or zsh-functions to show you available functions\ntry entering env to see environment variables'"
-
+alias code="codium"
+alias kiro-cli-trust="kiro-cli chat --trust-all-tools"
+alias pn="pnpm"
+alias pnx="pnpx"
 alias killchromium="pgrep Chromium | xargs kill -9"
 alias clean-docker='docker system prune -a'
 alias clean-coveo='~/coveo-platform/commerce-service/scripts/createcatalog.py && ~/coveo-platform/commerce-service/scripts/createsource.py  && ~/coveo-platform/commerce-service/scripts/ft-testorg.py && ~/coveo-platform/commerce-service/scripts/setup-testorg.py'
@@ -370,13 +389,123 @@ alias gco="git checkout"
 alias gp="git push"
 alias gpo="git push -u"
 alias gcam="git commit -a -m"
-alias glog="git log --oneline --graph --decorate -20"
 
+# git
 # Show last X commits (default 10)
-glast() {
-  local count="${1:-10}"
-  git --no-pager log --oneline -n "$count"
+glog () {
+  local number_of_commits="${1:-10}"
+  git log --oneline --graph --decorate -"$number_of_commits"
 }
+
+# kiro 
+kiro-cli-create-worktree () {
+  local new_branch=$1
+  if [[ -z "$new_branch" ]]; then
+    echo "❌ Usage: kiro-cli-create-worktree <worktree-branch-name>"
+    return 1
+  fi
+
+  # Must be in a git repo
+  repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "Not in a git repo"; return 1; }
+
+  base_branch=$(git remote show origin 2>/dev/null | sed -n '/HEAD branch/s/.*: //p')
+  base_branch=${base_branch:-master}
+  wt_dir="$repo_root/.worktrees/$new_branch"
+
+  git worktree add -b "$new_branch" "$wt_dir" "$base_branch" --quiet
+  echo "Worktree: $wt_dir"
+  echo "Branch:   $new_branch (based on $base_branch)"
+  echo ""
+  echo "When done, push and open a PR:"
+  echo "  cd $wt_dir && git push -u origin $new_branch"
+
+  cd "$wt_dir"
+}
+
+kiro-cli-create-workspace-feature() {
+  local FEATURE_NAME=$1
+  if [[ -z "$FEATURE_NAME" ]]; then
+    echo "❌ Usage: kiro-cli-create-workspace-feature <feature-branch-name>"
+    return 1
+  fi
+
+  local SRC_WORKSPACE="$HOME/coveo-platform/copilot"
+  local META_DIR="$HOME/workspaces/$FEATURE_NAME"
+
+  if [[ ! -d "$META_DIR" ]]; then
+    echo "🚀 Creating meta-workspace: $META_DIR"
+    mkdir -p "$META_DIR"
+
+    for repo_path in "$SRC_WORKSPACE"/*/; do
+      if [[ -d "$repo_path/.git" ]] || [[ -f "$repo_path/.git" ]]; then
+        local repo_name=$(basename "$repo_path")
+        local target_wt="$META_DIR/$repo_name"
+
+        git -C "$repo_path" fetch --quiet
+        local base_branch=$(git -C "$repo_path" remote show origin 2>/dev/null | sed -n '/HEAD branch/s/.*: //p')
+        base_branch=${base_branch:-master}
+
+        echo "🌿 [$repo_name] worktree on $FEATURE_NAME (from $base_branch)"
+        git -C "$repo_path" worktree add -b "$FEATURE_NAME" "$target_wt" "origin/$base_branch" --quiet 2>/dev/null || \
+        git -C "$repo_path" worktree add "$target_wt" "$FEATURE_NAME" --quiet 2>/dev/null
+
+        if [[ ! -d "$target_wt" ]]; then
+          echo "  ⚠️  Failed to create worktree for $repo_name"
+        fi
+      fi
+    done
+    cp -r "$SRC_WORKSPACE/.kiro" "$META_DIR/.kiro/";
+  else
+    echo "🔄 Meta-folder found. Resuming..."
+  fi
+
+  if ! tmux has-session -t "$FEATURE_NAME" 2>/dev/null; then
+    echo "📦 Starting tmux session..."
+    tmux new-session -d -s "$FEATURE_NAME" -c "$META_DIR"
+    tmux send-keys -t "$FEATURE_NAME" "kiro-cli chat --trust-all-tools" C-m
+  fi
+
+  tmux attach-session -t "$FEATURE_NAME"
+}
+
+launch-kiro-feature-cleanup() {
+  local FEATURE_NAME=$1
+  if [[ -z "$FEATURE_NAME" ]]; then
+    echo "❌ Usage: launch-kiro-feature-cleanup <feature-branch-name>"
+    return 1
+  fi
+
+  local SRC_WORKSPACE="$HOME/coveo-platform/copilot"
+  local META_DIR="$HOME/workspaces/$FEATURE_NAME"
+
+  # Kill tmux session
+  if tmux has-session -t "$FEATURE_NAME" 2>/dev/null; then
+    tmux kill-session -t "$FEATURE_NAME"
+    echo "🔪 Killed tmux session: $FEATURE_NAME"
+  fi
+
+  # Remove worktrees and optionally delete branches
+  for repo_path in "$SRC_WORKSPACE"/*/; do
+    if [[ -d "$repo_path/.git" ]] || [[ -f "$repo_path/.git" ]]; then
+      local repo_name=$(basename "$repo_path")
+      local target_wt="$META_DIR/$repo_name"
+
+      if [[ -d "$target_wt" ]]; then
+        git -C "$repo_path" worktree remove "$target_wt" --force 2>/dev/null
+        echo "🧹 [$repo_name] worktree removed"
+      fi
+    fi
+  done
+
+  # Remove meta directory
+  if [[ -d "$META_DIR" ]]; then
+    rm -rf "$META_DIR"
+    echo "🗑️  Removed $META_DIR"
+  fi
+
+  echo "✅ Cleanup complete for: $FEATURE_NAME"
+}
+
 
 alias override-screenshots-folder='echo "defaults write com.apple.screencapture location <path here>"'
 alias delete-mail='echo "d *" | mail -N'
@@ -425,10 +554,10 @@ export PATH="/usr/local/opt/openjdk@11/bin:$PATH"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # pnpm
-export PNPM_HOME="$HOME/Library/pnpm"
+export PNPM_HOME="/Users/samuel/Library/pnpm"
 case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
 esac
 # pnpm end
 
@@ -461,3 +590,8 @@ eval "$(zoxide init zsh)"
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+background() {
+    nohup "$@" </dev/null &>/dev/null &
+    disown
+}

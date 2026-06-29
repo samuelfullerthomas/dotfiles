@@ -21,6 +21,10 @@
 	path = /Users/samuel/.gitconfig.coveo
 [includeIf "gitdir:/Users/samuel/coveo-platform/"]
   path = /Users/samuel/.gitconfig.coveo
+[includeIf "gitdir:/Users/samuel/.kiro/"]
+  path = /Users/samuel/.gitconfig.coveo
+[includeIf "gitdir:/Users/samuel/workspace/"]
+  path = /Users/samuel/.gitconfig.coveo
 [init]
 	defaultBranch = main
 [alias]
