@@ -1,13 +1,5 @@
 /*
 /*/
-!.gitconfig
 !/setup-machine/
-!.zshrc
 !.gitignore
-!.gitconfig.*
-!.gitignore_global
-!.vim
-!.vimrc
 !README.md
-!.sleep
-!.wakeup
