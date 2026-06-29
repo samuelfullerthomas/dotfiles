@@ -77,6 +77,36 @@ cp ~/.gitconfig.<profile> ~/setup-machine/dotfiles/git/
 cd ~/setup-machine && make dotfiles
 ```
 
+
+## Machine-specific config (private branch)
+
+Some machines have extra dotfiles (work credentials, company-specific tools) tracked on a private branch in a separate repo. The `main` branch stays clean and public.
+
+**Setup on a work machine** (after `make all`):
+
+```bash
+cd ~/setup-machine
+git remote add private git@github.com:<you>/dotfiles-private.git
+git fetch private
+git checkout <branch>   # e.g. coveo
+make dotfiles           # stow the extra files
+```
+
+**Editing shared dotfiles** (e.g. `.zshrc`) from a work machine:
+
+Always commit shared changes to `main`, then rebase the private branch on top:
+
+```bash
+git checkout main
+# make your changes
+git add -p && git commit
+git push origin main
+
+git checkout <private-branch>
+git rebase main
+git push private --force-with-lease
+```
+
 ## Adding new dotfiles
 
 1. Create the file in the appropriate stow package (mirror the ~ path)
