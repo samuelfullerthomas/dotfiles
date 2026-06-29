@@ -7,7 +7,7 @@ Machine setup for macOS. Uses Homebrew, GNU Stow, and a Makefile.
 Open Terminal and run:
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/samuelfullerthomas/dotfiles/master/setup-machine/bootstrap-new-machine.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/samuelfullerthomas/dotfiles/main/setup-machine/bootstrap-new-machine.sh)"
 ```
 
 This installs Xcode CLI tools, Homebrew, clones the repo, generates an SSH key, and copies it to your clipboard.
@@ -39,12 +39,42 @@ setup-machine/
 ├── bootstrap-new-machine.sh   # Curl this on a fresh machine
 ├── setup-machine-fundamentals.sh
 ├── change-prefs.sh            # macOS defaults
+├── add-work-profile.sh        # Add a work/private git profile
 ├── iterm/                     # iTerm config + color schemes
 └── dotfiles/                  # Stow packages → symlinked into ~
-    ├── git/                   # .gitconfig, .gitconfig.coveo, etc.
+    ├── git/                   # .gitconfig, .gitconfig.<profile>, etc.
     ├── bin/                   # ~/.local/bin scripts (git-recent, git-lg)
     ├── vim/                   # .vimrc, color scheme
     └── shell/                 # .zshrc, .sleep, .wakeup
+```
+
+## Work / Private Profiles
+
+Git supports per-directory identity via `includeIf`. This lets you use a different name, email, and GPG key for work repos without touching your personal config.
+
+Run the interactive setup script:
+
+```bash
+cd ~/setup-machine
+./add-work-profile.sh
+```
+
+It will:
+1. Create `~/.gitconfig.<profile>` with your work identity
+2. Add an `includeIf "gitdir:~/work/"` block to `~/.gitconfig`
+
+Any repo inside the specified directory will automatically use the work identity. To verify:
+
+```bash
+cd ~/work/some-repo
+git config user.email  # should show work email
+```
+
+To track a profile in dotfiles (e.g. on a private branch):
+
+```bash
+cp ~/.gitconfig.<profile> ~/setup-machine/dotfiles/git/
+cd ~/setup-machine && make dotfiles
 ```
 
 ## Adding new dotfiles
