@@ -4,6 +4,7 @@
 	signingkey = 4EFD83FB40FABF3D
 [core]
 	excludesfile = ~/.gitignore_global
+	pager = cat
 [pager]
 	branch = false
 [filter "lfs"]
@@ -17,10 +18,7 @@
 	default = current
 [pull]
 	rebase = false
-[includeIf "gitdir:/Users/samuel/coveo/"]
-	path = /Users/samuel/.gitconfig.coveo
-[includeIf "gitdir:/Users/samuel/coveo-platform/"]
-	path = /Users/samuel/.gitconfig.coveo
+
 [init]
 	defaultBranch = main
 [alias]
