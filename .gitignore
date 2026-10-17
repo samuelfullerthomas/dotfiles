@@ -3,3 +3,10 @@
 !/setup-machine/
 !.gitignore
 !README.md
+
+# only track hand-written scripts under .local (installers write the rest)
+/setup-machine/dotfiles/bin/.local/*
+!/setup-machine/dotfiles/bin/.local/bin/
+/setup-machine/dotfiles/bin/.local/bin/*
+!/setup-machine/dotfiles/bin/.local/bin/git-lg
+!/setup-machine/dotfiles/bin/.local/bin/git-recent

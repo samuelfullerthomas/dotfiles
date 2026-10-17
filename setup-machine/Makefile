@@ -12,7 +12,7 @@ apps:
 
 # Symlink dotfiles into ~ via stow
 dotfiles:
-	cd dotfiles && stow --adopt --target=$(HOME) git bin vim shell
+	cd dotfiles && stow --no-folding --adopt --target=$(HOME) git bin vim shell
 
 # macOS preferences
 prefs:
