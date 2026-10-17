@@ -14,9 +14,9 @@ sudo nvram SystemAudioVolume=" "
 # Follow the keyboard focus while zoomed in
 # defaults write com.apple.universalaccess closeViewZoomFollowsFocus -bool true
 
-# Set the screenshots folder to the cloud
-mkdir /Users/$USER/Documents/Screenshots
-defaults write com.apple.screencapture location /Users/$USER/Documents/Screenshots
+# Keep screenshots out of iCloud, in ~/Screenshots
+mkdir -p /Users/$USER/Screenshots
+defaults write com.apple.screencapture location /Users/$USER/Screenshots
 
 # Set a fast keyboard repeat rate
 defaults write NSGlobalDomain KeyRepeat -int 1
