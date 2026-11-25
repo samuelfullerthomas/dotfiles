@@ -1,0 +1,8 @@
+# Only hand-written scripts under .local are tracked; installers write the rest.
+dotfiles/bin/.local/*
+!dotfiles/bin/.local/bin/
+dotfiles/bin/.local/bin/*
+!dotfiles/bin/.local/bin/git-lg
+!dotfiles/bin/.local/bin/git-recent
+# Which machine this checkout is (work or personal); written by bootstrap.sh or `make machine`.
+.machine

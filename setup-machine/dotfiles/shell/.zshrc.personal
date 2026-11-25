@@ -1,0 +1,7 @@
+# Personal machine only (link.sh skips *.personal on work). Sourced from .zshrc
+# after oh-my-zsh, so options here override its defaults.
+
+# Tab inserts the first match right away and cycles through the rest.
+setopt MENU_COMPLETE
+# Case-insensitive completion (cd down -> cd Downloads).
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'

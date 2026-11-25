@@ -1,125 +1,78 @@
 # Dotfiles
 
-Machine setup for macOS. Uses Homebrew, GNU Stow, and a Makefile.
+Setup for my two Macs (work and personal) with Homebrew, GNU Stow and a Makefile.
+`setup-machine/AGENTS.md` lists the design decisions.
 
-## New Machine Setup
-
-Open Terminal and run:
-
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/samuelfullerthomas/dotfiles/main/setup-machine/bootstrap-new-machine.sh)"
-```
-
-This installs Xcode CLI tools, Homebrew, clones the repo, generates an SSH key, and copies it to your clipboard.
-
-Then add the key at https://github.com/settings/ssh/new and run:
+## New Mac
 
 ```bash
-cd ~/setup-machine
-make all
+curl -fsSL https://raw.githubusercontent.com/samuelfullerthomas/dotfiles/main/setup-machine/bootstrap.sh | bash -s personal   # or work
 ```
 
-## What `make all` does
+It installs Xcode tools and Homebrew, makes an SSH key and waits for you to add it
+to GitHub, checks the repo out into `~`, then runs `make apply` and `make doctor`.
+Every step checks first, so it's safe to rerun. By default it clones the private
+repo (see below); `DOTFILES_REPO=<url>` clones another.
 
-| Target | What it does |
-|--------|-------------|
-| `make bootstrap` | SSH key, Xcode CLI tools, Homebrew |
-| `make apps` | Install everything in the Brewfile |
-| `make dotfiles` | Symlink dotfiles into ~ via stow |
-| `make prefs` | Apply macOS preferences |
+## Day to day
 
-Run any target individually to update just that piece.
+Edit files in `setup-machine/`, then:
 
-## Structure
+| Command | What it does |
+|---|---|
+| `make apply` | `make apps` + `make link` + `make prefs` |
+| `make apps` | `brew bundle` from `Brewfile` |
+| `make link` | Link `dotfiles/*` into `~` (`link.sh`) |
+| `make prefs` | macOS defaults from `prefs.list` (`change-prefs.sh`) |
+| `make check` | shellcheck, plus what `make apply` would change |
+| `make doctor` | Read-only health check: key repeat, links, zsh startup time, iTerm, git and SSH |
+| `make machine MACHINE=work\|personal` | Remember which Mac this is (`.machine`, not committed) |
 
-```
-setup-machine/
-├── Makefile
-├── Brewfile                    # Declarative app/tool installs
-├── bootstrap-new-machine.sh   # Curl this on a fresh machine
-├── setup-machine-fundamentals.sh
-├── change-prefs.sh            # macOS defaults
-├── add-work-profile.sh        # Add a work/private git profile
-├── iterm/                     # iTerm config + color schemes
-└── dotfiles/                  # Stow packages → symlinked into ~
-    ├── git/                   # .gitconfig, .gitconfig.<profile>, etc.
-    ├── bin/                   # ~/.local/bin scripts (git-recent, git-lg)
-    ├── vim/                   # .vimrc, color scheme
-    └── shell/                 # .zshrc, .sleep, .wakeup
-```
+## Work and personal
 
-## Work / Private Profiles
+One branch serves both Macs. `MACHINE` picks the differences:
 
-Git supports per-directory identity via `includeIf`. This lets you use a different name, email, and GPG key for work repos without touching your personal config.
+- `Brewfile`: the `if work` / `unless work` blocks.
+- `prefs.list`: the first column is `all`, `work` or `personal`.
+- `dotfiles/`: `*.coveo` files are linked only on work, `*.personal` only on personal.
 
-Run the interactive setup script:
+## Linking
+
+`link.sh` runs `stow --no-folding`, so each file is its own link and directories
+like `~/.local` stay real. A file already in `~` is moved to
+`~/.dotfiles-backup/<time>/`, never overwritten (no `stow --adopt`). If an older
+setup folded a directory into the repo, `make link` refuses and `./unfold.sh`
+repairs it; run that from a plain terminal.
+
+To track a new file, put it in a stow package at its path under `~`, then `make link`:
 
 ```bash
-cd ~/setup-machine
-./add-work-profile.sh
+mkdir -p setup-machine/dotfiles/foo/.config/foo
+mv ~/.config/foo/bar.toml setup-machine/dotfiles/foo/.config/foo/
 ```
 
-It will:
-1. Create `~/.gitconfig.<profile>` with your work identity
-2. Add an `includeIf "gitdir:~/work/"` block to `~/.gitconfig`
+New packages also go in `STOW_PACKAGES` in `lib/common.sh`.
 
-Any repo inside the specified directory will automatically use the work identity. To verify:
+## Private repo
+
+`dotfiles-private` is this repo plus private files: work config (`*.coveo`, git
+`includeIf` rules) and scripts that name private hosts. Its `main` has this repo
+as the `upstream-origin` remote:
 
 ```bash
-cd ~/work/some-repo
-git config user.email  # should show work email
+# shareable change: commit it here first, then in the private checkout
+git fetch upstream-origin && git merge upstream-origin/main
 ```
 
-To track a profile in dotfiles (e.g. on a private branch):
+Changes only flow from public to private. Never push the private `main` here.
+Secrets go in neither repo: `~/.local-secrets` (mode 600) is sourced by `.zshrc`.
 
-```bash
-cp ~/.gitconfig.<profile> ~/setup-machine/dotfiles/git/
-cd ~/setup-machine && make dotfiles
-```
+## Git profiles
+
+`.gitconfig` uses `includeIf "gitdir:..."` to switch identity per directory.
+`./add-work-profile.sh` creates `~/.gitconfig.<profile>` and adds the include.
 
 
-## Machine-specific config (private branch)
-
-Some machines have extra dotfiles (work credentials, company-specific tools) tracked on a private branch in a separate repo. The `main` branch stays clean and public.
-
-**Setup on a work machine** (after `make all`):
-
-```bash
-cd ~/setup-machine
-git remote add private git@github.com:<you>/dotfiles-private.git
-git fetch private
-git checkout <branch>   # e.g. coveo
-make dotfiles           # stow the extra files
-```
-
-**Editing shared dotfiles** (e.g. `.zshrc`) from a work machine:
-
-Always commit shared changes to `main`, then rebase the private branch on top:
-
-```bash
-git checkout main
-# make your changes
-git add -p && git commit
-git push origin main
-
-git checkout <private-branch>
-git rebase main
-git push private --force-with-lease
-```
-
-## Adding new dotfiles
-
-1. Create the file in the appropriate stow package (mirror the ~ path)
-2. Run `make dotfiles` to symlink it
-
-Example: to track `~/.config/foo/bar.toml`:
-```bash
-mkdir -p dotfiles/foo/.config/foo
-mv ~/.config/foo/bar.toml dotfiles/foo/.config/foo/
-make dotfiles
-```
-
-## Manual steps
 
 ## GPG Keys
 

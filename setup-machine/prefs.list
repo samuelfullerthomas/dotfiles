@@ -1,0 +1,37 @@
+# macOS defaults, read by change-prefs.sh (apply) and doctor.sh (check).
+# machine|domain|key|type|value|label
+# machine: all, work or personal. domain: "currentHost:<domain>" for -currentHost.
+# type: bool, int, float or string. A leading ~ in value expands to $HOME.
+
+# Keyboard. KeyRepeat and InitialKeyRepeat are in 15 ms ticks; log out to apply.
+all|NSGlobalDomain|KeyRepeat|int|1|Key repeat interval (1 = 15 ms, below the System Settings minimum)
+all|NSGlobalDomain|InitialKeyRepeat|int|15|Delay before key repeat starts (15 = 225 ms)
+all|NSGlobalDomain|ApplePressAndHoldEnabled|bool|false|Holding a key repeats it instead of showing the accent picker
+
+# Trackpad and mouse
+all|com.apple.driver.AppleBluetoothMultitouch.trackpad|TrackpadThreeFingerDrag|bool|true|Three-finger drag (Bluetooth trackpad)
+all|com.apple.AppleMultitouchTrackpad|TrackpadThreeFingerDrag|bool|true|Three-finger drag (built-in trackpad)
+all|NSGlobalDomain|com.apple.mouse.scaling|float|3|Mouse tracking speed
+all|NSGlobalDomain|com.apple.trackpad.scaling|int|3|Trackpad tracking speed
+
+# Screenshots
+work|com.apple.screencapture|location|string|~/Documents/Screenshots|Screenshot folder
+personal|com.apple.screencapture|location|string|~/Screenshots|Screenshot folder
+
+# Finder
+all|com.apple.finder|ShowExternalHardDrivesOnDesktop|bool|true|Show external drives on the desktop
+all|com.apple.finder|ShowHardDrivesOnDesktop|bool|true|Show hard drives on the desktop
+all|com.apple.finder|ShowMountedServersOnDesktop|bool|true|Show mounted servers on the desktop
+all|com.apple.finder|ShowRemovableMediaOnDesktop|bool|true|Show removable media on the desktop
+all|NSGlobalDomain|AppleShowAllExtensions|bool|true|Show all filename extensions
+all|com.apple.finder|FXDefaultSearchScope|string|SCcf|Search the current folder by default
+
+# Dock
+all|com.apple.dock|autohide|bool|true|Auto-hide the Dock
+
+# Photos
+all|currentHost:com.apple.ImageCapture|disableHotPlug|bool|true|Don't open Photos when a device is plugged in
+
+# Chrome
+all|com.google.Chrome|AppleEnableSwipeNavigateWithScrolls|bool|false|Chrome: no trackpad back-swipe
+all|com.google.Chrome|AppleEnableMouseSwipeNavigateWithScrolls|bool|false|Chrome: no Magic Mouse back-swipe

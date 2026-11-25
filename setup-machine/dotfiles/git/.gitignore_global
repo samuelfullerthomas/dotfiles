@@ -11,4 +11,7 @@ node_modules
 #other folders
 .cache
 .local-secrets
-.worktrees
+.playwright-mcp
+.kiro
+
+**/.claude/settings.local.json
