@@ -1,0 +1,2 @@
+# "~/..." in messages is display text, and single-quoted $(...) is meant for another shell.
+disable=SC2088,SC2016

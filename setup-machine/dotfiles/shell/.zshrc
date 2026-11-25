@@ -1,4 +1,7 @@
 
+# Kiro CLI pre block. Keep at the top of this file.
+[[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh"
+
 SSH_ENV="$HOME/.ssh/environment"
 [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
 [[ -s "$HOME/.gvm/scripts/gvm" ]] && source "$HOME/.gvm/scripts/gvm"
@@ -14,9 +17,6 @@ export ZSH=$HOME/.oh-my-zsh
 # path to pnpm bin
 export PATH="$HOME/Library/pnpm:$PATH"
 
-export HUSKY_ENABLED=1 
-export HUSKY_TESTS_ENABLED=1
-
 # theme
 ZSH_THEME="cloud"
 
@@ -25,10 +25,16 @@ ZSH_THEME="cloud"
 export GPG_TTY=$(tty)
 
 # source ZSH
-source $ZSH/oh-my-zsh.sh
+if [[ -f $ZSH/oh-my-zsh.sh ]]; then
+  source $ZSH/oh-my-zsh.sh
+else
+  print -u2 "oh-my-zsh is missing: run ~/setup-machine/doctor.sh"
+fi
 
-# source koviro wrapper
-source ~/coveo-platform/koviro/scripts/koviro.sh
+# coveo-specific config (only on the coveo machine)
+[[ -f "$HOME/.zshrc.coveo" ]] && source "$HOME/.zshrc.coveo"
+# personal-only config (only on the personal machine)
+[[ -f "$HOME/.zshrc.personal" ]] && source "$HOME/.zshrc.personal"
 
 # source iterm integration (conditional load is at end of file)
 # source ~/.iterm2_shell_integration.zsh
@@ -41,15 +47,6 @@ export XDG_DATA_HOME="$HOME/.local/share"
 
 # java
 export CPPFLAGS="-I/usr/local/opt/openjdk@11/include"
-
-# turbo
-export TURBO_NO_UPDATE_NOTIFIER=true
-
-# coveo token (lazy loaded - call coveo_token to set it)
-coveo_token() {
-  export COVEO_TOKEN=$(coveo config:get accessToken | jq -r .accessToken)
-  echo "COVEO_TOKEN set"
-}
 
 # functions
 function repeatspeed () {
@@ -110,20 +107,19 @@ function openpr() {
     pr_url=$github_url"/compare/"$main_branch_name"..."$branch_name"?quick_pull=1"$template_param
     echo -n $branch_name | pbcopy
     open $pr_url;
+    echo "🔗 $pr_url"
     if [[ "$github_url" == *"admin-ui"* ]]; then
-      echo "⚠️  Remember to add reviewer: gh pr edit <number> --add-reviewer coveo-platform/commerce-group-3"
+      echo "⚠️  Remember to add reviewer: gh pr edit <number> --add-reviewer coveo-platform/command-agentic-operation"
     fi
     return
+  else
+    pr_url=`gh pr view --json url -q .url`
+    echo "🔗 $pr_url"
   fi
 }
 
 function ape() {
   git push -u && openpr
-}
-
-function openjira () {
-  ticket=`git rev-parse --abbrev-ref HEAD`
-  open https://coveord.atlassian.net/browse/$ticket
 }
 
 function grephelp() {
@@ -152,16 +148,7 @@ function background() {
 }
 
 function reload() {
-  source ~/.zshrc
-}
-
-getCodeArtifactToken() {
-  local registry_without_protocol="//coveo-021891587241.d.codeartifact.us-east-1.amazonaws.com/npm/development/"
-  local domain owner
-  domain=$(echo "$registry_without_protocol" | sed -n 's|//\([a-zA-Z0-9_]*\)-\([0-9]*\)\..*|\1|p')
-  owner=$(echo "$registry_without_protocol" | sed -n 's|//\([a-zA-Z0-9_]*\)-\([0-9]*\)\..*|\2|p')
-  token=$(aws codeartifact get-authorization-token --region us-east-1 --domain "$domain" --domain-owner "$owner" --query authorizationToken --output text)
-  npm config set ${registryWithoutProtocol}:_authToken=${token}
+  exec zsh
 }
 
 # ===== Utility Functions =====
@@ -270,57 +257,7 @@ function start_agent {
     /usr/bin/ssh-add;
 }
 
-# coveo
-coveo_prepare() {
-  # login to aws sso & export credentials
-  aws sso login
-  # cd into the admin-ui directory
-  cd ~/coveo-platform/admin-ui
-  # stash current changes
-  BRANCH_NAME=$(git branch --show-current)
-  git add .
-  git stash
-  # switch to master branch
-  git checkout master
-  # pull latest changes
-  git pull
-  # install dependencies & build
-  pnpm install
-  pnpm run build
-  pnpm run type-check --force
-  # switch back to original branch
-  git checkout $BRANCH_NAME
-  git stash pop
-}
 
-coveo_login () {
-  local token_file="$HOME/.aws/token_age"
-  local max_age=$((8 * 60 * 60))  # 8 hours in seconds
-  local needs_login=false
-
-  # Check if token file exists and is within 8 hours
-  if [[ -f "$token_file" ]]; then
-    local token_time=$(cat "$token_file")
-    local current_time=$(date +%s)
-    local age=$((current_time - token_time))
-    if [[ $age -ge $max_age ]]; then
-      echo "AWS token is older than 8 hours. Logging in..."
-      needs_login=true
-    else
-      local remaining=$(((max_age - age) / 60))
-      echo "AWS token is valid. ${remaining} minutes remaining."
-    fi
-  else
-    echo "No token timestamp found. Logging in..."
-    needs_login=true
-  fi
-
-  if [[ "$needs_login" == true ]]; then
-    aws sso login
-    # Record login timestamp
-    date +%s > "$token_file"
-  fi
-}
 
 # iterm
 iterm2_print_user_vars() {
@@ -349,8 +286,7 @@ function onStartup {
       start_agent;
   fi
   # jf cvo update
-  nvm use default
-  getCodeArtifactToken
+  (( $+functions[nvm] )) && nvm use default
 
   # local max_age=$((24 * 60 * 60))  # 24 hours in seconds
   # local should_update=false
@@ -367,14 +303,12 @@ function onStartup {
   # if [[ "$should_update" == true ]]; then
   # fi
 
-  coveo_login
-  getCodeArtifactToken
+  (( $+functions[onStartupCoveo] )) && onStartupCoveo
 }
 
 # aliases
-alias zsh-aliases="grep alias ~/.zshrc"
-alias zsh-functions="grep function ~/.zshrc"
-alias zsh="codium ~/.zshrc"
+alias zsh-aliases="grep alias ~/.zshrc ~/.zshrc.coveo 2>/dev/null"
+alias zsh-functions="grep function ~/.zshrc ~/.zshrc.coveo 2>/dev/null"
 alias zshrc="codium ~/.zshrc"
 alias help="echo 'try the command zsh-aliases to show you available aliases, or zsh-functions to show you available functions\ntry entering env to see environment variables'"
 alias code="codium"
@@ -383,18 +317,24 @@ alias pn="pnpm"
 alias pnx="pnpx"
 alias killchromium="pgrep Chromium | xargs kill -9"
 alias clean-docker='docker system prune -a'
-alias clean-coveo='~/coveo-platform/commerce-service/scripts/createcatalog.py && ~/coveo-platform/commerce-service/scripts/createsource.py  && ~/coveo-platform/commerce-service/scripts/ft-testorg.py && ~/coveo-platform/commerce-service/scripts/setup-testorg.py'
 
 alias gco="git checkout"
 alias gp="git push"
 alias gpo="git push -u"
 alias gcam="git commit -a -m"
 
+
 # git
 # Show last X commits (default 10)
 glog () {
   local number_of_commits="${1:-10}"
   git log --oneline --graph --decorate -"$number_of_commits"
+}
+
+# Last X commits, flat (default 10)
+glast() {
+  local count="${1:-10}"
+  git --no-pager log --oneline -n "$count"
 }
 
 # kiro 
@@ -422,89 +362,6 @@ kiro-cli-create-worktree () {
   cd "$wt_dir"
 }
 
-kiro-cli-create-workspace-feature() {
-  local FEATURE_NAME=$1
-  if [[ -z "$FEATURE_NAME" ]]; then
-    echo "❌ Usage: kiro-cli-create-workspace-feature <feature-branch-name>"
-    return 1
-  fi
-
-  local SRC_WORKSPACE="$HOME/coveo-platform/copilot"
-  local META_DIR="$HOME/workspaces/$FEATURE_NAME"
-
-  if [[ ! -d "$META_DIR" ]]; then
-    echo "🚀 Creating meta-workspace: $META_DIR"
-    mkdir -p "$META_DIR"
-
-    for repo_path in "$SRC_WORKSPACE"/*/; do
-      if [[ -d "$repo_path/.git" ]] || [[ -f "$repo_path/.git" ]]; then
-        local repo_name=$(basename "$repo_path")
-        local target_wt="$META_DIR/$repo_name"
-
-        git -C "$repo_path" fetch --quiet
-        local base_branch=$(git -C "$repo_path" remote show origin 2>/dev/null | sed -n '/HEAD branch/s/.*: //p')
-        base_branch=${base_branch:-master}
-
-        echo "🌿 [$repo_name] worktree on $FEATURE_NAME (from $base_branch)"
-        git -C "$repo_path" worktree add -b "$FEATURE_NAME" "$target_wt" "origin/$base_branch" --quiet 2>/dev/null || \
-        git -C "$repo_path" worktree add "$target_wt" "$FEATURE_NAME" --quiet 2>/dev/null
-
-        if [[ ! -d "$target_wt" ]]; then
-          echo "  ⚠️  Failed to create worktree for $repo_name"
-        fi
-      fi
-    done
-    cp -r "$SRC_WORKSPACE/.kiro" "$META_DIR/.kiro/";
-  else
-    echo "🔄 Meta-folder found. Resuming..."
-  fi
-
-  if ! tmux has-session -t "$FEATURE_NAME" 2>/dev/null; then
-    echo "📦 Starting tmux session..."
-    tmux new-session -d -s "$FEATURE_NAME" -c "$META_DIR"
-    tmux send-keys -t "$FEATURE_NAME" "kiro-cli chat --trust-all-tools" C-m
-  fi
-
-  tmux attach-session -t "$FEATURE_NAME"
-}
-
-launch-kiro-feature-cleanup() {
-  local FEATURE_NAME=$1
-  if [[ -z "$FEATURE_NAME" ]]; then
-    echo "❌ Usage: launch-kiro-feature-cleanup <feature-branch-name>"
-    return 1
-  fi
-
-  local SRC_WORKSPACE="$HOME/coveo-platform/copilot"
-  local META_DIR="$HOME/workspaces/$FEATURE_NAME"
-
-  # Kill tmux session
-  if tmux has-session -t "$FEATURE_NAME" 2>/dev/null; then
-    tmux kill-session -t "$FEATURE_NAME"
-    echo "🔪 Killed tmux session: $FEATURE_NAME"
-  fi
-
-  # Remove worktrees and optionally delete branches
-  for repo_path in "$SRC_WORKSPACE"/*/; do
-    if [[ -d "$repo_path/.git" ]] || [[ -f "$repo_path/.git" ]]; then
-      local repo_name=$(basename "$repo_path")
-      local target_wt="$META_DIR/$repo_name"
-
-      if [[ -d "$target_wt" ]]; then
-        git -C "$repo_path" worktree remove "$target_wt" --force 2>/dev/null
-        echo "🧹 [$repo_name] worktree removed"
-      fi
-    fi
-  done
-
-  # Remove meta directory
-  if [[ -d "$META_DIR" ]]; then
-    rm -rf "$META_DIR"
-    echo "🗑️  Removed $META_DIR"
-  fi
-
-  echo "✅ Cleanup complete for: $FEATURE_NAME"
-}
 
 
 alias override-screenshots-folder='echo "defaults write com.apple.screencapture location <path here>"'
@@ -520,7 +377,7 @@ alias lock="/opt/homebrew/bin/blueutil -p 0 && /bin/sleep 2 && /usr/bin/pmset sl
 alias docker-cleanup='brew cleanup && docker system prune'
 
 # ruby
-eval "$(rbenv init -)"
+(( $+commands[rbenv] )) && eval "$(rbenv init -)"
 
 # go
 export GOPATH="$HOME/go"
@@ -549,12 +406,16 @@ export PATH="/opt/homebrew/opt/python@3.14/libexec/bin:$PATH"
 
 # nvm
 export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+  \. "$NVM_DIR/nvm.sh" # nvm installed with its own script
+elif [ -s /opt/homebrew/opt/nvm/nvm.sh ]; then
+  \. /opt/homebrew/opt/nvm/nvm.sh # nvm installed by the Brewfile
+fi
 export PATH="/usr/local/opt/openjdk@11/bin:$PATH"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # pnpm
-export PNPM_HOME="/Users/samuel/Library/pnpm"
+export PNPM_HOME="$HOME/Library/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME/bin:"*) ;;
   *) export PATH="$PNPM_HOME/bin:$PATH" ;;
@@ -562,13 +423,8 @@ esac
 # pnpm end
 
 
-# call startup function
-onStartup
-# The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=(/Users/samuel/.docker/completions $fpath)
-autoload -Uz compinit
-compinit
-# End of Docker CLI completions
+# call startup function (doctor.sh sets SETUP_MACHINE_DOCTOR to skip its logins and agent setup)
+[[ -z $SETUP_MACHINE_DOCTOR ]] && onStartup
 export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"
 
 # The next line updates PATH for the Google Cloud SDK.
@@ -579,10 +435,7 @@ if [ -f '/Users/samuel/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/sa
 
 # zoxide - smarter cd command (install with: brew install zoxide)
 # Use 'z' to jump to directories, e.g., 'z admin' -> ~/coveo-platform/admin-ui
-eval "$(zoxide init zsh)"
-
-
-. "$HOME/.local/share/../bin/env"
+(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
 
 # bun completions
 [ -s "/Users/samuel/.bun/_bun" ] && source "/Users/samuel/.bun/_bun"
@@ -595,3 +448,19 @@ background() {
     nohup "$@" </dev/null &>/dev/null &
     disown
 }
+
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+
+# Kiro CLI post block. Keep at the bottom of this file.
+[[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh"
+
+[[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
+
+# pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+(( $+commands[pyenv] )) && eval "$(pyenv init - zsh)"

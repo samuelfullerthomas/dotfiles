@@ -1,9 +1,9 @@
-# Taps
-tap "atlassian/acli"
-tap "ankitpokhrel/jira-cli"
-tap "danielgtaylor/restish"
-tap "hashicorp/tap"
-tap "snyk/tap"
+# Installed with `make apps`, which passes HOMEBREW_MACHINE=work|personal.
+# Anything installed but not listed here shows up in `make doctor` and `make check`.
+machine = ENV["HOMEBREW_MACHINE"] || (File.read(File.expand_path("~/setup-machine/.machine")).strip rescue nil)
+# Homebrew only passes HOMEBREW_* variables through, hence HOMEBREW_MACHINE.
+raise "Set HOMEBREW_MACHINE=work|personal (make and doctor.sh do this)" unless %w[work personal].include?(machine)
+work = machine == "work"
 
 # Core dev tools
 brew "git"
@@ -11,8 +11,10 @@ brew "git-lfs"
 brew "git-filter-repo"
 brew "git-gui"
 brew "gh"
+brew "gnupg"
 brew "just"
 brew "lefthook"
+brew "shellcheck"
 brew "stow"
 brew "tmux"
 brew "fzf"
@@ -20,38 +22,24 @@ brew "ripgrep"
 brew "zoxide"
 brew "tree"
 brew "btop"
+brew "rtk"
 
 # Languages & runtimes
 brew "nvm"
 brew "uv"
 brew "go"
-brew "maven"
-brew "openjdk@21"
 
 # Cloud & infra
 brew "awscli"
-brew "hashicorp/tap/terraform"
-brew "terragrunt"
-brew "kubernetes-cli"
-brew "helm"
-brew "stern"
-brew "docker-credential-helper"
-brew "docker-credential-helper-ecr"
 
 # Networking & services
 brew "mkcert"
 
 # CLI utilities
-brew "atlassian/acli/acli"
-brew "ankitpokhrel/jira-cli/jira-cli"
-cask "danielgtaylor/restish/restish"
-brew "snyk/tap/snyk"
-brew "jfrog-cli"
-brew "slackdump"
 brew "rename"
 brew "grep"
 brew "blueutil"
-brew "sleepwatcher"
+brew "sleepwatcher", restart_service: :changed
 brew "pinentry-mac"
 
 # Media
@@ -69,7 +57,6 @@ cask "vscodium"
 cask "claude"
 cask "iterm2"
 cask "docker-desktop"
-cask "lens"
 
 # Casks - utilities
 cask "alt-tab"
@@ -87,5 +74,30 @@ cask "vlc"
 cask "obsidian"
 cask "bear"
 
-# Casks - network
-cask "viscosity"
+unless work
+  brew "pyenv"
+  brew "sshpass"
+end
+
+if work
+  tap "atlassian/acli"
+  tap "hashicorp/tap"
+  tap "snyk/tap"
+
+  brew "maven"
+  brew "openjdk@21"
+  brew "hashicorp/tap/terraform"
+  brew "terragrunt"
+  brew "kubernetes-cli"
+  brew "helm"
+  brew "stern"
+  brew "docker-credential-helper"
+  brew "docker-credential-helper-ecr"
+  brew "atlassian/acli/acli"
+  brew "snyk/tap/snyk"
+  brew "jfrog-cli"
+  brew "slackdump"
+
+  cask "lens"
+  cask "viscosity"
+end
